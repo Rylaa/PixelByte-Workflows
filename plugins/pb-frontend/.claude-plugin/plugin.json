@@ -1,5 +1,5 @@
 {
-  "name": "pixelbyte-frontend",
+  "name": "pb-frontend",
   "version": "1.0.0",
   "description": "Senior-level frontend development guidelines for React/TypeScript. Modern patterns including Suspense, SWR, shadcn/ui, Tailwind CSS, Next.js App Router, and performance optimization.",
   "author": {

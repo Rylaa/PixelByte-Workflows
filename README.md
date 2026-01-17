@@ -1,4 +1,4 @@
-# Pixelbyte Plugins
+# PB Workflows
 
 Claude Code plugin collection with modular installation. Install only what you need.
 
@@ -18,25 +18,25 @@ Then install individual plugins:
 
 ```bash
 # Install all plugins
-claude plugin install pixelbyte-figma
-claude plugin install pixelbyte-frontend
-claude plugin install pixelbyte-code-review
+claude plugin install pb-figma
+claude plugin install pb-frontend
+claude plugin install pb-code-review
 
 # Or install only what you need
-claude plugin install pixelbyte-figma  # Just Figma-to-code
+claude plugin install pb-figma  # Just Figma-to-code
 ```
 
 ## Available Plugins
 
 | Plugin | Description | Category |
 |--------|-------------|----------|
-| `pixelbyte-figma` | Figma-to-code conversion with pixel-perfect accuracy | Design |
-| `pixelbyte-frontend` | Senior-level frontend development guidelines | Development |
-| `pixelbyte-code-review` | Prompt compliance checker agent | Quality |
+| `pb-figma` | Figma-to-code conversion with pixel-perfect accuracy | Design |
+| `pb-frontend` | Senior-level frontend development guidelines | Development |
+| `pb-code-review` | Prompt compliance checker agent | Quality |
 
 ---
 
-## pixelbyte-figma
+## pb-figma
 
 Converts Figma designs to pixel-perfect React/Tailwind code using a 5-phase workflow with 85%+ accuracy target.
 
@@ -82,7 +82,7 @@ Automatically configures `pixelbyte-figma-mcp` with these tools:
 
 ---
 
-## pixelbyte-frontend
+## pb-frontend
 
 Senior-level frontend development guidelines for React/TypeScript applications.
 
@@ -111,7 +111,7 @@ Automatically invoked when creating components, pages, or features. Mention "fro
 
 ---
 
-## pixelbyte-code-review
+## pb-code-review
 
 Validates that implementation matches the original prompt/request.
 
@@ -126,7 +126,7 @@ Validates that implementation matches the original prompt/request.
 
 Via Task tool:
 ```
-Task(subagent_type="pixelbyte-code-review:prompt-compliance-checker", prompt="Review my changes against the original prompt")
+Task(subagent_type="pb-code-review:prompt-compliance-checker", prompt="Review my changes against the original prompt")
 ```
 
 Or ask: "Check if my changes match what was requested"

@@ -1,5 +1,5 @@
 {
-  "name": "pixelbyte-code-review",
+  "name": "pb-code-review",
   "version": "1.0.0",
   "description": "Prompt compliance checker agent for validating implementations against requirements. Detects regressions, identifies gaps, and ensures code changes match the original prompt.",
   "author": {

@@ -1,5 +1,5 @@
 {
-  "name": "pixelbyte-figma",
+  "name": "pb-figma",
   "version": "1.0.0",
   "description": "Figma-to-code conversion with pixel-perfect accuracy using Pixelbyte Figma MCP Server. 5-phase workflow with visual validation.",
   "author": {
