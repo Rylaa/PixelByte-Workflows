@@ -1,0 +1,113 @@
+{{!-- 
+  component.tsx.hbs
+  
+  Figma-to-code dönüşümünde kullanılan React bileşen şablonu.
+  Handlebars ile dinamik olarak doldurulur.
+  
+  Kullanım:
+  const template = Handlebars.compile(fs.readFileSync('component.tsx.hbs', 'utf-8'));
+  const code = template({ componentName: 'HeroCard', props: [...], ... });
+--}}
+import React from 'react';
+{{#if hasForwardRef}}
+import { forwardRef } from 'react';
+{{/if}}
+{{#if useCn}}
+import { cn } from '@/lib/utils';
+{{/if}}
+{{#if icons}}
+import { {{#each icons}}{{this}}{{#unless @last}}, {{/unless}}{{/each}} } from 'lucide-react';
+{{/if}}
+{{#each imports}}
+import { {{name}} } from '{{path}}';
+{{/each}}
+
+{{!-- Props Interface --}}
+{{#if props}}
+export interface {{componentName}}Props {{#if extendsProps}}extends {{extendsProps}} {{/if}}{
+{{#each props}}
+  /**
+   * {{description}}
+   {{#if defaultValue}}* @default {{{defaultValue}}}{{/if}}
+   */
+  {{name}}{{#unless required}}?{{/unless}}: {{type}};
+{{/each}}
+{{#if hasChildren}}
+  /**
+   * Child elements
+   */
+  children?: React.ReactNode;
+{{/if}}
+{{#if hasClassName}}
+  /**
+   * Additional CSS classes
+   */
+  className?: string;
+{{/if}}
+}
+{{/if}}
+
+{{!-- Component Variants (if using CVA) --}}
+{{#if variants}}
+const {{camelCase componentName}}Variants = cva(
+  '{{baseClasses}}',
+  {
+    variants: {
+{{#each variants}}
+      {{name}}: {
+{{#each options}}
+        {{name}}: '{{classes}}',
+{{/each}}
+      },
+{{/each}}
+    },
+    defaultVariants: {
+{{#each defaultVariants}}
+      {{name}}: '{{value}}',
+{{/each}}
+    },
+  }
+);
+{{/if}}
+
+{{!-- Component Definition --}}
+{{#if hasForwardRef}}
+export const {{componentName}} = forwardRef<{{refType}}, {{componentName}}Props>(
+  ({ {{#each props}}{{name}}{{#if defaultValue}} = {{{defaultValue}}}{{/if}}, {{/each}}{{#if hasChildren}}children, {{/if}}{{#if hasClassName}}className, {{/if}}...props }, ref) => {
+{{else}}
+export const {{componentName}}: React.FC<{{componentName}}Props> = ({
+{{#each props}}
+  {{name}}{{#if defaultValue}} = {{{defaultValue}}}{{/if}},
+{{/each}}
+{{#if hasChildren}}
+  children,
+{{/if}}
+{{#if hasClassName}}
+  className,
+{{/if}}
+}) => {
+{{/if}}
+  return (
+    <{{rootElement}}
+      {{#if hasForwardRef}}ref={ref}{{/if}}
+      {{#if hasClassName}}className={cn('{{rootClasses}}', className)}{{else}}className="{{rootClasses}}"{{/if}}
+      {{#if testId}}data-testid="{{kebabCase componentName}}"{{/if}}
+      {{#each ariaAttributes}}
+      {{name}}="{{value}}"
+      {{/each}}
+      {{#if hasForwardRef}}{...props}{{/if}}
+    >
+{{!-- Nested Structure --}}
+{{{nestedContent}}}
+    </{{rootElement}}>
+  );
+{{#if hasForwardRef}}
+  }
+);
+
+{{componentName}}.displayName = '{{componentName}}';
+{{else}}
+};
+{{/if}}
+
+export default {{componentName}};

@@ -1,12 +1,12 @@
 {
   "name": "pixelbyte-agent-workflows",
   "version": "1.0.0",
-  "description": "Pixelbyte workflow agents for code review and compliance checking",
+  "description": "Pixelbyte workflow agents for code review, compliance checking, Figma-to-code conversion, and frontend development guidelines",
   "author": {
     "name": "Pixelbyte",
     "url": "https://github.com/Rylaa"
   },
   "repository": "https://github.com/Rylaa/pixelbyte-agent-workflows",
   "license": "MIT",
-  "keywords": ["code-review", "compliance", "prompt-validation", "implementation-checker"]
+  "keywords": ["code-review", "compliance", "prompt-validation", "implementation-checker", "figma", "figma-to-code", "design-to-code", "react", "tailwind", "typescript", "nextjs", "frontend", "swr", "suspense", "performance"]
 }
