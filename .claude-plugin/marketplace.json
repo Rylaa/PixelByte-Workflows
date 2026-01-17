@@ -1,11 +1,18 @@
 {
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
   "name": "pixelbyte-plugins",
+  "version": "1.0.0",
   "description": "Pixelbyte plugin collection for Figma-to-code, frontend development, and code review workflows",
+  "owner": {
+    "name": "Pixelbyte",
+    "email": "yusufdemirkoparan@gmail.com"
+  },
   "plugins": [
     {
       "name": "pixelbyte-agent-workflows",
       "description": "Figma-to-code conversion, frontend dev guidelines, and prompt compliance checking",
-      "repository": "Rylaa/pixelbyte-agent-workflows"
+      "version": "1.0.0",
+      "source": "."
     }
   ]
 }
