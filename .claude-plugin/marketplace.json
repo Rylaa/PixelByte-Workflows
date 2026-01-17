@@ -1,0 +1,11 @@
+{
+  "name": "pixelbyte-plugins",
+  "description": "Pixelbyte plugin collection for Figma-to-code, frontend development, and code review workflows",
+  "plugins": [
+    {
+      "name": "pixelbyte-agent-workflows",
+      "description": "Figma-to-code conversion, frontend dev guidelines, and prompt compliance checking",
+      "repository": "Rylaa/pixelbyte-agent-workflows"
+    }
+  ]
+}
