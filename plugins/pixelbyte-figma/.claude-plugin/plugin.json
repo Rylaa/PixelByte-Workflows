@@ -1,0 +1,12 @@
+{
+  "name": "pixelbyte-figma",
+  "version": "1.0.0",
+  "description": "Figma-to-code conversion with pixel-perfect accuracy using Pixelbyte Figma MCP Server. 5-phase workflow with visual validation.",
+  "author": {
+    "name": "Pixelbyte",
+    "url": "https://github.com/Rylaa"
+  },
+  "repository": "https://github.com/Rylaa/pixelbyte-agent-workflows",
+  "license": "MIT",
+  "keywords": ["figma", "figma-to-code", "design-to-code", "react", "tailwind", "typescript", "pixel-perfect", "design-tokens"]
+}

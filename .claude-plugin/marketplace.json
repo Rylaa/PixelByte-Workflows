@@ -1,21 +1,43 @@
 {
   "name": "pixelbyte-plugins",
-  "description": "Pixelbyte plugin collection for Figma-to-code, frontend development, and code review workflows",
+  "description": "Pixelbyte plugin collection for Figma-to-code, frontend development, and code review workflows. Install individual plugins based on your needs.",
   "owner": {
     "name": "Pixelbyte",
     "url": "https://github.com/Rylaa"
   },
   "plugins": [
     {
-      "name": "pixelbyte-agent-workflows",
-      "description": "Figma-to-code conversion, frontend dev guidelines, and prompt compliance checking",
+      "name": "pixelbyte-figma",
+      "description": "Figma-to-code conversion with pixel-perfect accuracy. Includes Pixelbyte Figma MCP Server for design token extraction and 5-phase workflow with visual validation.",
       "version": "1.0.0",
       "author": {
         "name": "Pixelbyte",
         "url": "https://github.com/Rylaa"
       },
-      "source": "./plugins/pixelbyte-agent-workflows",
+      "source": "./plugins/pixelbyte-figma",
+      "category": "design"
+    },
+    {
+      "name": "pixelbyte-frontend",
+      "description": "Senior-level frontend development guidelines for React/TypeScript. Covers Suspense, SWR, shadcn/ui, Tailwind CSS, Next.js App Router, performance, and accessibility.",
+      "version": "1.0.0",
+      "author": {
+        "name": "Pixelbyte",
+        "url": "https://github.com/Rylaa"
+      },
+      "source": "./plugins/pixelbyte-frontend",
       "category": "development"
+    },
+    {
+      "name": "pixelbyte-code-review",
+      "description": "Prompt compliance checker agent for validating implementations against requirements. Detects regressions and ensures code matches the original prompt.",
+      "version": "1.0.0",
+      "author": {
+        "name": "Pixelbyte",
+        "url": "https://github.com/Rylaa"
+      },
+      "source": "./plugins/pixelbyte-code-review",
+      "category": "quality"
     }
   ]
 }

@@ -1,0 +1,12 @@
+{
+  "name": "pixelbyte-frontend",
+  "version": "1.0.0",
+  "description": "Senior-level frontend development guidelines for React/TypeScript. Modern patterns including Suspense, SWR, shadcn/ui, Tailwind CSS, Next.js App Router, and performance optimization.",
+  "author": {
+    "name": "Pixelbyte",
+    "url": "https://github.com/Rylaa"
+  },
+  "repository": "https://github.com/Rylaa/pixelbyte-agent-workflows",
+  "license": "MIT",
+  "keywords": ["react", "typescript", "nextjs", "frontend", "tailwind", "swr", "suspense", "performance", "best-practices"]
+}
