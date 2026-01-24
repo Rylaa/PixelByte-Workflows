@@ -506,7 +506,7 @@ When MCP generation is unavailable, generate code from spec:
 2. **Layout classes** from Classes/Styles field
 3. **Semantic element** from Element field
 4. **Children** from Children field
-5. **Design tokens** from Design Tokens Ready to Use section
+5. **Design tokens** from Design Tokens (Ready to Use) section
 
 ### Generate Structure
 ```tsx
