@@ -31,6 +31,12 @@ The `file_key` can be obtained through:
    ```
    Then ask the user to select from available specs.
 
+3. **Extract from spec header** - After selecting a spec, extract the file_key from the spec's header:
+   ```
+   Look for: **File Key:** {file_key}
+   ```
+   This file_key is required for MCP calls to `figma_generate_code`.
+
 ### Implementation Spec Contents
 
 Extract from the spec:
@@ -39,7 +45,7 @@ Extract from the spec:
 |---------|-------------|
 | Component Hierarchy | Tree structure with semantic HTML elements |
 | Components | Detailed component specs with properties, layout, styles |
-| Design Tokens Ready to Use | CSS custom properties and Tailwind token map |
+| Design Tokens (Ready to Use) | CSS custom properties and Tailwind token map |
 | Downloaded Assets | Asset paths and import statements |
 | Assets Required | Node IDs for each component (used for MCP generation) |
 
@@ -99,8 +105,9 @@ cat build.gradle 2>/dev/null | grep -E 'android|kotlin'
 | `Package.swift` | SwiftUI |
 | `build.gradle` with "android" | Kotlin (Android) |
 | None of the above | HTML/CSS fallback |
+| **Modifier:** `tailwind.config.*` or "tailwindcss" in package.json | +Tailwind (applied to detected framework) |
 
-Also check for Tailwind:
+Check for Tailwind (modifier applied after framework detection):
 ```bash
 # Check for Tailwind configuration
 ls tailwind.config.* 2>/dev/null || cat package.json | grep tailwind
@@ -226,6 +233,28 @@ Include ARIA attributes and focus states:
 ```
 
 #### 3. Write Component Files
+
+##### Detect Existing Directory Structure
+
+Before writing files, detect existing project conventions:
+
+```bash
+# React/Next.js: Check for existing component directories
+Glob("src/components/**/*.tsx") || Glob("components/**/*.tsx") || Glob("app/components/**/*.tsx")
+
+# Vue/Nuxt: Check for existing component directories
+Glob("src/components/**/*.vue") || Glob("components/**/*.vue")
+
+# SwiftUI: Check for existing view directories
+Glob("Sources/**/*.swift") || Glob("**/Views/**/*.swift")
+
+# Kotlin: Check for existing UI directories
+Glob("app/src/main/java/**/ui/**/*.kt") || Glob("**/composables/**/*.kt")
+```
+
+Use the detected structure to determine where to place new components. If no existing structure is found, use the default structure below.
+
+##### Default Directory Structures
 
 Write to the appropriate directory based on framework:
 
