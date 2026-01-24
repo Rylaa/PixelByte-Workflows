@@ -26,6 +26,8 @@ URL formats:
 - `https://www.figma.com/design/{file_key}/{name}?node-id={node_id}`
 - `https://www.figma.com/file/{file_key}/{name}?node-id={node_id}`
 
+**Note:** If `node_id` is not provided in the URL, validate the entire file starting from the document root. Use depth parameter to control traversal scope.
+
 ## Validation Checklist
 
 For each node and its children, verify:
@@ -56,16 +58,43 @@ If any data is unclear or missing:
 3. Use `figma_get_styles` for published styles
 4. Document what could NOT be resolved
 
+## Status Determination
+
+Determine final validation status based on these criteria:
+
+- **FAIL**: Any of the following:
+  - File structure retrieval fails
+  - `file_key` is invalid or inaccessible
+  - More than 5 unresolved items remain after resolution attempts
+  - Critical node data cannot be fetched
+
+- **WARN**: Any of the following (without FAIL conditions):
+  - Warnings present (e.g., missing Auto Layout)
+  - Optional data missing (e.g., no published styles)
+  - 1-5 unresolved items remain
+  - Some assets lack export settings
+
+- **PASS**: All of the following:
+  - All structure checks complete successfully
+  - Design tokens extracted
+  - No errors or warnings
+  - Zero unresolved items
+
 ## Process
+
+Use `TodoWrite` to track validation progress through these steps:
 
 1. **Parse URL** - Extract file_key and node_id
 2. **Get Structure** - Use `figma_get_file_structure` with depth=10
 3. **Get Screenshot** - Capture visual reference with `figma_get_screenshot`
+   - Save screenshot to: `docs/figma-reports/{file_key}-{timestamp}.png`
+   - Use format: `{file_key}-{YYYYMMDD-HHmmss}.png`
 4. **Extract Tokens** - Use `figma_get_design_tokens` for colors, typography, spacing
 5. **List Assets** - Use `figma_list_assets` to catalog images, icons, vectors
 6. **Deep Inspection** - For each component, use `figma_get_node_details`
 7. **Resolve Gaps** - Attempt to fill missing data with additional MCP calls
-8. **Generate Report** - Write Validation Report
+8. **Ensure Output Directory** - Create `docs/figma-reports/` if it does not exist
+9. **Generate Report** - Write Validation Report to `docs/figma-reports/{file_key}-validation.md`
 
 ## Output: Validation Report
 
@@ -147,3 +176,9 @@ Ready for: Design Analyst Agent
 - If file_key invalid → Report error, stop
 - If node not found → Try parent node, warn
 - If MCP call fails → Retry once, then document failure
+
+### Timeout & Rate Limits
+
+- **Timeout**: If an MCP call takes longer than expected, wait and retry once. If it fails again, document the timeout and continue with available data.
+- **Rate Limits**: If you receive rate limit errors (429), wait 5-10 seconds between subsequent calls. Batch requests where possible to minimize API calls.
+- **Large Files**: For files with many nodes (>100), consider validating in sections rather than all at once to avoid timeouts.
