@@ -48,6 +48,71 @@ Add to MCP configuration:
 5. **Leverage Code Connect** — Map Figma components to existing codebase components
 6. **Require Auto Layout** — Warn if source design lacks Auto Layout
 
+## Agent Pipeline
+
+This skill orchestrates a 5-agent pipeline for Figma-to-code conversion:
+
+### Pipeline Flow
+
+```
+Figma URL
+    │
+    ▼
+┌─────────────────────────┐
+│ 1. design-validator     │ → Validation Report
+└─────────────────────────┘
+    │
+    ▼
+┌─────────────────────────┐
+│ 2. design-analyst       │ → Implementation Spec
+└─────────────────────────┘
+    │
+    ▼
+┌─────────────────────────┐
+│ 3. asset-manager        │ → Updated Spec + Assets
+└─────────────────────────┘
+    │
+    ▼
+┌─────────────────────────┐
+│ 4. code-generator       │ → Component Files
+└─────────────────────────┘
+    │
+    ▼
+┌─────────────────────────┐
+│ 5. compliance-checker   │ → Final Report
+└─────────────────────────┘
+```
+
+### Invoking the Pipeline
+
+When a Figma URL is provided, invoke agents sequentially:
+
+1. **Start:** Parse Figma URL, create report directory
+2. **Agent 1:** Dispatch `design-validator` with URL
+3. **Agent 2:** Dispatch `design-analyst` with validation report path
+4. **Agent 3:** Dispatch `asset-manager` with spec path
+5. **Agent 4:** Dispatch `code-generator` with updated spec path
+6. **Agent 5:** Dispatch `compliance-checker` with spec and code paths
+7. **Complete:** Present Final Report to user
+
+### Report Directory
+
+All reports saved to: `docs/figma-reports/`
+
+```
+docs/figma-reports/
+├── {file_key}-validation.md   # Agent 1 output
+├── {file_key}-spec.md         # Agent 2+3 output
+└── {file_key}-final.md        # Agent 5 output
+```
+
+### Manual Override
+
+Users can run individual agents:
+- "Just validate this design" → Run only design-validator
+- "Generate code from this spec" → Run only code-generator
+- "Check compliance" → Run only compliance-checker
+
 ## Source Design Requirements
 
 **Auto Layout is REQUIRED.** Designs without Auto Layout cannot be converted to proper HTML structure.
