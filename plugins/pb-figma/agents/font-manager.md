@@ -730,3 +730,191 @@ For Google Fonts, Android supports downloadable fonts:
 2. **App Compat:** The `app:` namespace attributes provide backward compatibility for devices below API 26.
 
 3. **Min SDK:** Font resources in XML require `minSdkVersion 16+`. Downloadable fonts require `minSdkVersion 14+` with AppCompat.
+
+---
+
+## Platform Setup: Vue
+
+### Directory Structure
+
+```
+project/
+├── public/
+│   └── fonts/
+│       ├── Inter-Regular.woff2
+│       ├── Inter-Medium.woff2
+│       └── ...
+├── src/
+│   ├── assets/
+│   │   └── styles/
+│   │       └── fonts.css
+│   ├── App.vue
+│   └── main.ts
+└── package.json
+```
+
+### Step 1: Detect Vue Project
+
+Use Glob tool to locate Vue project files:
+
+```
+Glob("**/package.json")
+```
+
+Then verify Vue dependency:
+
+```bash
+# Check for Vue
+grep -E '"vue"' package.json
+```
+
+### Step 2: Create Fonts Directory
+
+```bash
+mkdir -p public/fonts
+```
+
+### Step 3: Download Font Files
+
+Same as React - using Google Fonts API:
+
+```bash
+# Download font family
+curl -L "https://fonts.google.com/download?family={FontFamily}" -o /tmp/{FontFamily}.zip
+
+# Extract
+unzip -o /tmp/{FontFamily}.zip -d /tmp/{FontFamily}
+
+# Copy to project (prefer woff2, fallback to ttf)
+cp /tmp/{FontFamily}/static/*.woff2 public/fonts/ 2>/dev/null || \
+cp /tmp/{FontFamily}/*.ttf public/fonts/
+```
+
+### Step 4: Create CSS File
+
+Write to `src/assets/styles/fonts.css`:
+
+```css
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/Inter-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/Inter-Medium.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/Inter-SemiBold.woff2') format('woff2');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/Inter-Bold.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+```
+
+### Step 5: Import in Main Entry
+
+**Option A: Import in `src/main.ts` or `src/main.js`:**
+
+```typescript
+import { createApp } from 'vue'
+import App from './App.vue'
+import './assets/styles/fonts.css'  // Add this line
+
+createApp(App).mount('#app')
+```
+
+**Option B: Import in `src/App.vue`:**
+
+```vue
+<style>
+@import './assets/styles/fonts.css';
+
+:root {
+  --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+body {
+  font-family: var(--font-primary);
+}
+</style>
+```
+
+### Nuxt.js Alternative
+
+For Nuxt.js projects, use the built-in font optimization:
+
+**Option A: nuxt.config.ts with Google Fonts module:**
+
+```typescript
+// nuxt.config.ts
+export default defineNuxtConfig({
+  modules: ['@nuxtjs/google-fonts'],
+  googleFonts: {
+    families: {
+      Inter: [400, 500, 600, 700],
+    },
+    display: 'swap',
+  },
+})
+```
+
+**Option B: Manual setup in `assets/css/main.css`:**
+
+```css
+/* assets/css/main.css */
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/Inter-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+/* ... more weights */
+```
+
+Then include in `nuxt.config.ts`:
+
+```typescript
+export default defineNuxtConfig({
+  css: ['~/assets/css/main.css'],
+})
+```
+
+### Verification
+
+```bash
+# Check font files exist
+ls -la public/fonts/
+
+# Verify CSS import in entry file
+grep -r "fonts.css" src/
+
+# Start dev server and check DevTools
+npm run dev
+# Open DevTools > Network > Font, verify fonts load
+```
+
+### Important Notes
+
+1. **Path Prefix:** Vue/Vite serves files from `public/` at root URL. Use `/fonts/` not `./public/fonts/`.
+
+2. **Font Display:** Always use `font-display: swap` to prevent invisible text during font loading.
+
+3. **Vite Config:** If using custom public directory, update paths accordingly in `vite.config.ts`.
