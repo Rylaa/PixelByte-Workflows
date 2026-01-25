@@ -170,22 +170,20 @@ Search for fonts in this priority order:
 
 ### 1. Google Fonts (Primary)
 
-```
-WebFetch:
-  url: "https://fonts.google.com/download?family={font_family}"
-  prompt: "Download the font family zip file"
-```
-
-Alternative API check:
+Check availability via CSS API:
 ```
 WebFetch:
   url: "https://fonts.googleapis.com/css2?family={font_family}:wght@{weights}"
-  prompt: "Get the font CSS with download URLs"
+  prompt: "Check if font exists and extract woff2 file URLs from the CSS response"
 ```
 
+If font exists, the CSS response contains direct links to font files.
+
 **Google Fonts URL Pattern:**
-- CSS: `https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap`
-- Download: `https://fonts.google.com/download?family=Inter`
+- CSS (availability check): `https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap`
+- Download (use Bash/curl): `https://fonts.google.com/download?family=Inter`
+
+**Note:** WebFetch checks availability only. Actual font downloads use Bash commands in Platform Setup sections.
 
 ### 2. Font Squirrel (Fallback 1)
 
