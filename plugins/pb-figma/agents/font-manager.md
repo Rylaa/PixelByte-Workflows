@@ -912,3 +912,102 @@ npm run dev
 2. **Font Display:** Always use `font-display: swap` to prevent invisible text during font loading.
 
 3. **Vite Config:** If using custom public directory, update paths accordingly in `vite.config.ts`.
+
+---
+
+## Output: Update Spec File
+
+Modify the Implementation Spec at: `docs/figma-reports/{file_key}-spec.md`
+
+### Add "Fonts Setup" Section
+
+Insert after "Design Tokens" section:
+
+```markdown
+## Fonts Setup
+
+**Status:** COMPLETE | PARTIAL | FAILED
+**Platform:** {detected_platform}
+**Generated:** {timestamp}
+
+### Fonts Required
+
+| Font Family | Weights | Source | Status |
+|-------------|---------|--------|--------|
+| Inter | 400, 500, 600, 700 | Google Fonts | ✅ Downloaded |
+| Roboto | 400, 700 | Google Fonts | ✅ Downloaded |
+| SF Pro | 400, 600 | Not Found | ⚠️ Using fallback: Inter |
+
+### Files Created
+
+| File | Purpose |
+|------|---------|
+| `public/fonts/Inter-Regular.woff2` | Inter 400 weight |
+| `public/fonts/Inter-Medium.woff2` | Inter 500 weight |
+| `public/fonts/Inter-SemiBold.woff2` | Inter 600 weight |
+| `public/fonts/Inter-Bold.woff2` | Inter 700 weight |
+| `src/styles/fonts.css` | @font-face definitions |
+
+### Configuration Added
+
+#### For React/Next.js:
+```css
+/* Added to src/styles/globals.css */
+@import './fonts.css';
+
+:root {
+  --font-primary: 'Inter', -apple-system, sans-serif;
+}
+```
+
+#### For SwiftUI:
+```xml
+<!-- Added to Info.plist -->
+<key>UIAppFonts</key>
+<array>
+  <string>Fonts/Inter-Regular.ttf</string>
+  ...
+</array>
+```
+
+#### For Kotlin/Android:
+```
+Created: res/font/inter.xml
+Created: res/font/inter_regular.ttf, inter_medium.ttf, ...
+```
+
+### Usage Examples
+
+#### React/Next.js
+```tsx
+<h1 className="font-['Inter'] font-semibold">Title</h1>
+// or with CSS variable
+<h1 style={{ fontFamily: 'var(--font-primary)' }}>Title</h1>
+```
+
+#### SwiftUI
+```swift
+Text("Title")
+    .font(.custom("Inter-SemiBold", size: 24))
+// or with extension
+Text("Title")
+    .font(.inter(24, weight: .semibold))
+```
+
+#### Kotlin/Android
+```kotlin
+Text(
+    text = "Title",
+    fontFamily = InterFontFamily,
+    fontWeight = FontWeight.SemiBold
+)
+```
+
+### Warnings
+
+- {any warnings or notes}
+
+### Manual Steps Required
+
+- [ ] {any manual steps the user needs to complete}
+```
