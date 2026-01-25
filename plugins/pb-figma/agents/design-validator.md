@@ -172,10 +172,40 @@ Ready for: Design Analyst Agent
 
 ## Error Handling
 
-- If URL parsing fails → Report error, stop
-- If file_key invalid → Report error, stop
-- If node not found → Try parent node, warn
-- If MCP call fails → Retry once, then document failure
+**Reference:** `references/error-recovery.md`
+
+### Retry Logic
+
+For MCP calls, implement retry with backoff:
+
+```
+MAX_RETRIES = 3
+Retry on: timeout, rate_limit, network_error
+Backoff: 1s, 2s, 4s
+```
+
+### Error Matrix
+
+| Error | Recovery | Action |
+|-------|----------|--------|
+| Invalid URL | Stop | Report error to user |
+| Invalid file_key | Stop | Ask user to verify URL |
+| Node not found | Warn | Try parent node |
+| MCP timeout | Retry 3x | If fails, document |
+| Rate limit | Wait 60s | Then retry |
+| Missing tokens | Continue | Use fallbacks |
+
+### Fallback Values
+
+If design tokens cannot be extracted:
+
+| Token | Fallback |
+|-------|----------|
+| Font family | 'Inter', sans-serif |
+| Font size | 16px |
+| Color | #000000 |
+| Spacing | 16px |
+| Border radius | 8px |
 
 ### Timeout & Rate Limits
 

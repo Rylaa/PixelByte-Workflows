@@ -285,6 +285,39 @@ Asset directory: `public/assets/`
 
 ## Error Handling
 
+**Reference:** `references/error-recovery.md`
+
+### Download Recovery
+
+```
+For each asset:
+1. Attempt download
+2. If fails → Retry with backoff (3 attempts)
+3. If still fails → Document failure
+4. Continue with other assets
+5. Report partial success
+```
+
+### Format Fallback
+
+If requested format fails:
+
+| Requested | Fallback |
+|-----------|----------|
+| SVG | PNG |
+| WebP | PNG |
+| PDF | PNG |
+
+### Partial Success
+
+Continue if:
+- 80%+ assets downloaded
+- All critical assets (logo, hero) present
+
+Stop if:
+- 0 assets downloaded
+- All critical assets failed
+
 ### Download Fails
 1. Log the failure with error message
 2. Retry download once with same parameters
