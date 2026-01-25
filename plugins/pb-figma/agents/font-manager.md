@@ -384,3 +384,128 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 ```
 
 **Note:** `next/font` provides automatic optimization but requires code changes. Offer both options to user.
+
+## Platform Setup: SwiftUI/iOS
+
+### Directory Structure
+
+```
+project/
+├── {ProjectName}/
+│   ├── Resources/
+│   │   └── Fonts/
+│   │       ├── Inter-Regular.ttf
+│   │       ├── Inter-Medium.ttf
+│   │       ├── Inter-SemiBold.ttf
+│   │       └── Inter-Bold.ttf
+│   ├── Info.plist
+│   └── {ProjectName}App.swift
+└── {ProjectName}.xcodeproj
+```
+
+### Step 1: Find Project Structure
+
+```bash
+# Find xcodeproj
+Glob("**/*.xcodeproj")
+
+# Find existing Resources folder or Sources
+Glob("**/Resources") || Glob("**/Sources")
+```
+
+### Step 2: Create Fonts Directory
+
+```bash
+# Determine project root (parent of .xcodeproj)
+PROJECT_ROOT=$(dirname $(find . -name "*.xcodeproj" -type d | head -1))
+
+# Create fonts directory
+mkdir -p "$PROJECT_ROOT/Resources/Fonts"
+```
+
+### Step 3: Download and Copy Fonts
+
+```bash
+# Download font
+curl -L "https://fonts.google.com/download?family={FontFamily}" -o /tmp/{FontFamily}.zip
+unzip -o /tmp/{FontFamily}.zip -d /tmp/{FontFamily}
+
+# Copy TTF files (iOS prefers TTF/OTF)
+cp /tmp/{FontFamily}/static/*.ttf "$PROJECT_ROOT/Resources/Fonts/" 2>/dev/null || \
+cp /tmp/{FontFamily}/*.ttf "$PROJECT_ROOT/Resources/Fonts/"
+
+# Cleanup temp files
+rm -rf /tmp/{FontFamily}.zip /tmp/{FontFamily}
+```
+
+### Step 4: Update Info.plist
+
+Add fonts to `Info.plist`:
+
+```xml
+<key>UIAppFonts</key>
+<array>
+    <string>Fonts/Inter-Regular.ttf</string>
+    <string>Fonts/Inter-Medium.ttf</string>
+    <string>Fonts/Inter-SemiBold.ttf</string>
+    <string>Fonts/Inter-Bold.ttf</string>
+</array>
+```
+
+**Implementation:**
+
+```bash
+# Check if UIAppFonts key exists
+grep -q "UIAppFonts" "$PROJECT_ROOT/Info.plist"
+
+# If not, need to add it before closing </dict></plist>
+```
+
+Or use PlistBuddy:
+```bash
+/usr/libexec/PlistBuddy -c "Add :UIAppFonts array" "$PROJECT_ROOT/Info.plist" 2>/dev/null
+/usr/libexec/PlistBuddy -c "Add :UIAppFonts:0 string 'Fonts/Inter-Regular.ttf'" "$PROJECT_ROOT/Info.plist"
+/usr/libexec/PlistBuddy -c "Add :UIAppFonts:1 string 'Fonts/Inter-Medium.ttf'" "$PROJECT_ROOT/Info.plist"
+# ... repeat for each font
+```
+
+### Step 5: Create Font Extension (Optional)
+
+Create `FontExtensions.swift`:
+
+```swift
+import SwiftUI
+
+extension Font {
+    static func inter(_ size: CGFloat, weight: Font.Weight = .regular) -> Font {
+        let fontName: String
+        switch weight {
+        case .regular:
+            fontName = "Inter-Regular"
+        case .medium:
+            fontName = "Inter-Medium"
+        case .semibold:
+            fontName = "Inter-SemiBold"
+        case .bold:
+            fontName = "Inter-Bold"
+        default:
+            fontName = "Inter-Regular"
+        }
+        return .custom(fontName, size: size)
+    }
+}
+
+// Usage:
+// Text("Hello").font(.inter(16, weight: .medium))
+```
+
+### Important Notes
+
+1. **Xcode Project Update Required:** Fonts must be added to Xcode project manually or via script. The agent documents this requirement.
+
+2. **Font Names:** iOS uses the PostScript name, not filename. Check with:
+   ```bash
+   fc-scan --format "%{postscriptname}\n" Inter-Regular.ttf
+   ```
+
+3. **Bundle Target:** Ensure fonts are included in the app target's "Copy Bundle Resources" build phase.
