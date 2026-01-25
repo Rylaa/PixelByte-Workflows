@@ -81,6 +81,55 @@ Options:
 |----------|---------------|
 | Xcode/SwiftUI | `swiftui` |
 
+## Layer Order Parsing
+
+**CRITICAL:** Read Layer Order from Implementation Spec to determine ZStack ordering.
+
+**SwiftUI ZStack:** Last child renders on top (opposite of HTML/React)
+
+**Example spec:**
+```yaml
+layerOrder:
+  - layer: PageControl (zIndex: 900)
+  - layer: HeroImage (zIndex: 500)
+  - layer: ContinueButton (zIndex: 100)
+```
+
+**Generated SwiftUI order:**
+```swift
+// ZStack renders bottom-to-top (last = on top)
+ZStack(alignment: .top) {
+    ContinueButton()  // zIndex 100 - first = bottom
+    HeroImage()       // zIndex 500 - middle
+    PageControl()     // zIndex 900 - last = on top
+}
+```
+
+**CRITICAL:** Reverse zIndex sort for SwiftUI (lowest zIndex first in code)
+
+### Frame Positioning
+
+When spec includes `absoluteY`, use `.position()` or `.offset()`:
+
+```swift
+// PageControl at absoluteY: 60
+PageControl()
+    .position(x: UIScreen.main.bounds.width / 2, y: 60)
+    .zIndex(900)
+
+// ContinueButton at absoluteY: 800
+Button("Continue") { }
+    .position(x: UIScreen.main.bounds.width / 2, y: 800)
+    .zIndex(100)
+```
+
+**Position context mapping:**
+- `position: top` → `.frame(maxHeight: .infinity, alignment: .top)`
+- `position: center` → `.frame(maxHeight: .infinity, alignment: .center)`
+- `position: bottom` → `.frame(maxHeight: .infinity, alignment: .bottom)`
+
+**Prefer alignment over absolute positioning** when possible (more responsive).
+
 ## Code Generation
 
 ### For Each Component
