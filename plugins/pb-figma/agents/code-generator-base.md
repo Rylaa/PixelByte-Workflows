@@ -1,0 +1,213 @@
+---
+name: code-generator-base
+description: Base reference documentation for all framework-specific code generators. Defines shared logic for spec reading, validation, asset handling, error recovery, and output formatting. Not invoked directly - referenced by framework-specific agents.
+---
+
+# Code Generator Base Reference
+
+**Note:** This is reference documentation, not an executable agent. Framework-specific agents (react, swiftui, vue, kotlin) reference this for shared logic.
+
+## Shared Input Processing
+
+### Reading Implementation Spec
+
+All code generators read from: `docs/figma-reports/{file_key}-spec.md`
+
+#### Resolving file_key
+
+The `file_key` can be obtained through:
+
+1. **User provides directly** - User specifies the file_key or full filename
+2. **List and select** - If no file_key provided:
+   ```bash
+   ls docs/figma-reports/*-spec.md
+   ```
+   Ask user to select from available specs.
+
+3. **Extract from spec header** - After selecting, extract:
+   ```
+   Look for: **File Key:** {file_key}
+   ```
+
+### Implementation Spec Structure
+
+Extract these sections:
+
+| Section | Description |
+|---------|-------------|
+| Component Hierarchy | Tree structure with semantic elements |
+| Components | Detailed component specs with properties, layout, styles |
+| Design Tokens (Ready to Use) | CSS vars / Tailwind tokens / Platform-specific tokens |
+| Downloaded Assets | Asset paths and import statements |
+| Assets Required | Node IDs for each component (for MCP generation) |
+
+### Verification
+
+Check spec is ready:
+- Look for "Ready for: Code Generator Agent" in Next Agent Input section
+- Verify Downloaded Assets section exists
+- If not ready, warn user: "Asset Manager may not have completed"
+
+## Shared Process Flow
+
+Use `TodoWrite` to track progress:
+
+1. **Read Implementation Spec** - Load and parse the spec file
+2. **Verify Spec Status** - Check ready state
+3. **Detect Framework** - (Framework-specific logic)
+4. **Confirm with User** - Validate detection
+5. **Generate Component Code** - Use MCP + framework-specific enhancement
+6. **Write Component Files** - Framework-specific directory structure
+7. **Update Spec with Results** - Add Generated Code table
+
+## Shared MCP Integration
+
+### figma_generate_code Tool
+
+All agents use this MCP tool for base code generation:
+
+```
+figma_generate_code:
+  - file_key: {file_key}
+  - node_id: {node_id}
+  - framework: {framework_parameter}
+  - component_name: {ComponentName}
+```
+
+### Rate Limit Handling (Shared)
+
+**Critical:** All agents must implement:
+
+- Wait 2 seconds between MCP calls
+- If rate limited (429):
+  - Wait 30 seconds
+  - Retry with exponential backoff: 30s → 60s → 120s
+- Process in batches of 5 components
+- If MCP timeout (>30s): Retry once, then fall back to manual generation
+
+### MCP Framework Parameters
+
+Map to MCP framework parameter:
+
+| Framework | MCP Parameter |
+|-----------|---------------|
+| React + Tailwind | `react_tailwind` |
+| React (no Tailwind) | `react` |
+| Vue + Tailwind | `vue_tailwind` |
+| Vue (no Tailwind) | `vue` |
+| SwiftUI | `swiftui` |
+| Kotlin/Jetpack Compose | `kotlin` |
+| HTML/CSS | `html_css` |
+
+## Shared Error Handling
+
+### MCP Generation Fails
+
+1. Log error with component name and node ID
+2. Retry once with same parameters
+3. If retry fails:
+   - Fall back to manual generation using spec details
+   - Document in Generated Code table: status "MANUAL"
+   - Add note: "Generated from spec (MCP unavailable)"
+
+### Missing Assets
+
+1. Check if asset exists in Downloaded Assets section
+2. If missing:
+   - Use placeholder path (framework-specific)
+   - Add TODO comment in code
+   - Document with status "WARN - Missing asset"
+   - Add to summary: "Asset {name} not found - using placeholder"
+
+### Missing Node ID
+
+1. Log warning: "Component '{name}' missing node ID"
+2. Generate manually from spec details
+3. Document with status "MANUAL - No Node ID"
+
+### Spec Not Found
+
+If spec doesn't exist:
+1. Report error: "Implementation Spec not found"
+2. List available specs: `ls docs/figma-reports/*-spec.md`
+3. Provide instructions: "Run Asset Manager agent first"
+4. Stop processing
+
+## Shared Output Format
+
+### Update Spec with Results
+
+Add these sections to `docs/figma-reports/{file_key}-spec.md`:
+
+```markdown
+## Generated Code
+
+| Component | File | Status |
+|-----------|------|--------|
+| {ComponentName} | `{file_path}` | OK / WARN / MANUAL |
+
+## Code Generation Summary
+
+- **Framework:** {framework}
+- **Components generated:** {count}
+- **Files created:** {count}
+- **Warnings:** {count}
+- **Generation timestamp:** {YYYYMMDD-HHmmss}
+
+## Files Created
+
+### Components
+- `{component_file_1}`
+- `{component_file_2}`
+
+### Styles (if created)
+- `{tokens_file}`
+
+## Next Agent Input
+
+Ready for: Compliance Checker Agent
+Input file: `docs/figma-reports/{file_key}-spec.md`
+Components generated: {count}
+Framework: {framework}
+```
+
+## Manual Generation Fallback
+
+When MCP is unavailable, generate from spec:
+
+### Extract from Spec
+
+1. **Component properties** from Components section
+2. **Layout classes** from Classes/Styles field
+3. **Semantic element** from Element field
+4. **Children** from Children field
+5. **Design tokens** from Design Tokens section
+
+### Framework-Specific Templates
+
+Each framework agent provides its own manual generation template.
+
+## Shared Validation Checklist
+
+For each component, verify:
+
+- [ ] Hierarchy matches spec
+- [ ] Semantic elements used (not just div/View soup)
+- [ ] Tokens applied (no hardcoded values)
+- [ ] Type definitions included
+- [ ] Accessibility attributes present
+- [ ] Assets referenced correctly
+
+## Reference from Framework Agents
+
+Framework-specific agents should reference this document:
+
+```markdown
+## Base Logic
+
+See [code-generator-base.md](./code-generator-base.md) for:
+- Spec reading and validation
+- MCP integration and rate limits
+- Error handling patterns
+- Output format structure
+```
