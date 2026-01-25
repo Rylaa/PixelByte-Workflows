@@ -629,6 +629,57 @@ Upon receiving a Figma URL:
 - src/components/HeroCard.stories.tsx (optional)
 ```
 
+### 5.3 Test Generation
+
+Generate tests for each component created in Phase 3:
+
+**Reference:** `references/test-generation.md`
+
+**Steps:**
+
+1. **Analyze Component**
+   - Read component file
+   - Extract props interface
+   - Identify variants, handlers, states
+
+2. **Generate Unit Test**
+   - Create `{ComponentName}.test.tsx`
+   - Include rendering tests
+   - Include props/variant tests
+   - Include accessibility test (jest-axe)
+   - Include interaction tests
+
+3. **Generate Visual Test (Optional)**
+   - Create `{ComponentName}.visual.spec.ts`
+   - Include default state screenshot
+   - Include mobile viewport screenshot
+   - Include hover state screenshot
+
+4. **Run Tests**
+   ```bash
+   npm run test -- {ComponentName}
+   ```
+
+5. **Add to Handoff Checklist**
+   - [ ] Unit tests passing
+   - [ ] Accessibility tests passing
+   - [ ] Visual tests passing (if applicable)
+   - [ ] Coverage meets minimum (80%)
+
+### Phase 5 Handoff Checklist
+
+Before finalizing the handoff, ensure all items are complete:
+
+- [ ] All components generated
+- [ ] Design tokens applied
+- [ ] Assets downloaded and imported
+- [ ] Compliance check passed
+- [ ] **Unit tests generated and passing**
+- [ ] **Accessibility tests passing**
+- [ ] **Visual tests passing (if Playwright available)**
+- [ ] Code committed
+- [ ] Documentation updated
+
 ## Output Format
 
 **React/TypeScript component template:**
@@ -720,6 +771,7 @@ const fontFamily = "font-sans"; // Fallback
 - **Visual validation loop**: `references/visual-validation-loop.md`
 - **Common issues**: `references/common-issues.md`
 - **Preview route setup**: `references/preview-setup.md`
+- **Test generation guide**: `references/test-generation.md`
 
 ### Prompt Templates
 Phase-specific prompts located in `references/prompts/`:
