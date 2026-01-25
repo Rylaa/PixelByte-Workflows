@@ -251,3 +251,128 @@ AskUserQuestion:
     - "Skip this font (use system default)"
     - "I'll provide the font file manually"
 ```
+
+## Platform Setup: React/Next.js
+
+### Directory Structure
+
+```
+project/
+├── public/
+│   └── fonts/
+│       ├── Inter-Regular.woff2
+│       ├── Inter-Medium.woff2
+│       ├── Inter-SemiBold.woff2
+│       └── Inter-Bold.woff2
+├── src/
+│   └── styles/
+│       └── fonts.css
+└── package.json
+```
+
+### Step 1: Create Fonts Directory
+
+```bash
+mkdir -p public/fonts
+```
+
+### Step 2: Download Font Files
+
+For Google Fonts, download and extract:
+
+```bash
+# Download font family
+curl -L "https://fonts.google.com/download?family={FontFamily}" -o /tmp/{font-family}.zip
+
+# Extract to public/fonts
+unzip -o /tmp/{font-family}.zip -d /tmp/{font-family}
+
+# Copy woff2 files (preferred format)
+cp /tmp/{font-family}/static/*.woff2 public/fonts/ 2>/dev/null || \
+cp /tmp/{font-family}/*.ttf public/fonts/
+```
+
+### Step 3: Create CSS File
+
+Write to `src/styles/fonts.css`:
+
+```css
+/* Inter Font Family */
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/Inter-Regular.woff2') format('woff2'),
+       url('/fonts/Inter-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/Inter-Medium.woff2') format('woff2'),
+       url('/fonts/Inter-Medium.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/Inter-SemiBold.woff2') format('woff2'),
+       url('/fonts/Inter-SemiBold.ttf') format('truetype');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/Inter-Bold.woff2') format('woff2'),
+       url('/fonts/Inter-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+```
+
+### Step 4: Import in Global Styles
+
+Add to `src/styles/globals.css` or `src/app/globals.css`:
+
+```css
+@import './fonts.css';
+
+:root {
+  --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+body {
+  font-family: var(--font-primary);
+}
+```
+
+### Next.js Optimization (Alternative)
+
+For Next.js projects, recommend using `next/font`:
+
+```typescript
+// src/app/layout.tsx or pages/_app.tsx
+import { Inter } from 'next/font/google';
+
+const inter = Inter({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700'],
+  variable: '--font-inter',
+  display: 'swap',
+});
+
+export default function RootLayout({ children }) {
+  return (
+    <html className={inter.variable}>
+      <body>{children}</body>
+    </html>
+  );
+}
+```
+
+**Note:** `next/font` provides automatic optimization but requires code changes. Offer both options to user.
