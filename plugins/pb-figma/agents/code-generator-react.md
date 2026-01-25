@@ -102,7 +102,7 @@ layerOrder:
 <div className="container">
   <PageControl /> {/* zIndex 900 - renders on top */}
   <HeroImage />   {/* zIndex 500 - middle */}
-  <Button />      {/* zIndex 100 - bottom */}
+  <ContinueButton />      {/* zIndex 100 - bottom */}
 </div>
 ```
 
@@ -128,10 +128,19 @@ When spec includes `absoluteY`, use Tailwind absolute positioning:
 </button>
 ```
 
+**When to use wrapper divs:**
+- Use `<div className="absolute ...">` for layout containers or groups
+- Apply classes directly to semantic elements (`<button>`, `<img>`) when possible
+- Wrap components when you need to position them without modifying their internal structure
+
 **Position context mapping:**
-- `position: top` → `top-0` or `top-[absoluteY]`
+
+**When absoluteY is specified:** Always use `top-[absoluteY]` (absoluteY always measures from top)
+
+**When absoluteY is NOT specified:**
+- `position: top` → `top-0`
 - `position: center` → `top-1/2 -translate-y-1/2`
-- `position: bottom` → `bottom-0` or `top-[absoluteY]`
+- `position: bottom` → `bottom-0`
 
 ## Code Generation
 
