@@ -54,3 +54,64 @@ Extract:
 - Inter: weights [400, 700]
 - Roboto: weights [500]
 ```
+
+## Process
+
+Use `TodoWrite` to track font management progress:
+
+1. **Read Validation Report** - Parse typography section
+2. **Extract Unique Fonts** - Build font family + weights list
+3. **Detect Project Platform** - Identify React/Swift/Kotlin/Vue
+4. **Check Local Availability** - See if fonts already exist in project
+5. **Search Font Sources** - Query Google Fonts, Adobe, Font Squirrel
+6. **Download Fonts** - Fetch font files from best source
+7. **Setup for Platform** - Configure fonts per platform requirements
+8. **Update Spec** - Add "Fonts Setup" section to spec file
+
+## Font Detection
+
+### Step 1: Parse Typography from Validation Report
+
+```bash
+# Read the validation report
+Read("docs/figma-reports/{file_key}-validation.md")
+```
+
+Extract from the Typography table:
+- Font family names (e.g., "Inter", "Roboto", "SF Pro")
+- Font weights used (e.g., 400, 500, 700)
+- Infer styles (regular, italic based on naming)
+
+### Step 2: Direct Figma Verification (Optional)
+
+If validation report lacks detail, fetch directly:
+
+```
+figma_get_design_tokens:
+  - file_key: {file_key}
+  - include_typography: true
+```
+
+This returns comprehensive typography tokens including:
+- fontFamily
+- fontWeight
+- fontSize
+- lineHeight
+- letterSpacing
+
+### Step 3: Build Font Requirements List
+
+Create a structured list:
+
+```
+fonts_required:
+  - family: "Inter"
+    weights: [400, 500, 600, 700]
+    styles: [normal]
+    source: null  # to be determined
+
+  - family: "Roboto"
+    weights: [400, 700]
+    styles: [normal, italic]
+    source: null
+```
