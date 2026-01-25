@@ -72,7 +72,7 @@ Use `TodoWrite` to track font management progress:
 
 ### Step 1: Parse Typography from Validation Report
 
-```bash
+```
 # Read the validation report
 Read("docs/figma-reports/{file_key}-validation.md")
 ```
@@ -88,8 +88,8 @@ If validation report lacks detail, fetch directly:
 
 ```
 figma_get_design_tokens:
-  - file_key: {file_key}
-  - include_typography: true
+  file_key: {file_key}
+  include_typography: true
 ```
 
 This returns comprehensive typography tokens including:
