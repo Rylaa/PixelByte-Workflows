@@ -37,6 +37,9 @@ Instead of complex tools (ImageMagick, RMSE calculation), we use Claude's visual
 │  6. RESPONSIVE VALIDATION (Optional)                         │
 │     └─→ Validate tablet (768px) and mobile (375px)          │
 │                                                               │
+│  7. ACCESSIBILITY VALIDATION                                 │
+│     └─→ Keyboard nav, a11y tree, color contrast             │
+│                                                               │
 └──────────────────────────────────────────────────────────────┘
 ```
 
@@ -355,6 +358,67 @@ Skip responsive validation if:
 
 ---
 
+## Step 7: Accessibility Validation
+
+After visual validation, check accessibility:
+
+**Reference:** `references/accessibility-validation.md`
+
+### Automated Check (if test exists)
+
+```bash
+npm run test:a11y -- {ComponentName}
+```
+
+### Manual Checks
+
+1. **Keyboard Navigation**
+```javascript
+mcp__claude-in-chrome__computer({
+  action: "key",
+  text: "Tab",
+  repeat: 5,
+  tabId: <tab-id>
+})
+
+mcp__claude-in-chrome__computer({
+  action: "screenshot",
+  tabId: <tab-id>
+})
+```
+
+2. **Accessibility Tree**
+```javascript
+mcp__claude-in-chrome__read_page({
+  tabId: <tab-id>,
+  filter: "interactive"
+})
+```
+
+### Check For
+
+- [ ] All images have alt text
+- [ ] All buttons have accessible names
+- [ ] Focus visible on interactive elements
+- [ ] Color contrast sufficient
+- [ ] Semantic HTML used
+
+### Create Todos
+
+For each a11y issue found:
+```
+"A11y: [Issue description] → [Fix]"
+```
+
+### Fix and Verify
+
+1. Fix each a11y todo
+2. Re-run automated check
+3. Re-test keyboard navigation
+4. Proceed to Phase 5
+
+---
+
 ## Console Log Debugging
 
 Read console logs for debugging:
@@ -369,18 +433,17 @@ mcp__claude-in-chrome__read_console_messages({
 
 ---
 
-## Checklist
+## Final Checklist
 
 ```
-□ Tab context obtained (tabs_context_mcp)
+□ Tab context obtained
 □ Figma screenshot taken
-□ Browser screenshot taken (desktop)
-□ Claude Vision comparison done
-□ Differences listed with TodoWrite
-□ All todos completed
-□ Final check performed
+□ Browser screenshot taken
+□ Visual comparison done
+□ Visual differences fixed
 □ Desktop validation passed
-□ Tablet validation passed (optional)
-□ Mobile validation passed (optional)
-□ Proceed to Phase 5
+□ Responsive validation passed (optional)
+□ Accessibility validation passed
+□ All todos completed
+□ Ready for Phase 5
 ```
