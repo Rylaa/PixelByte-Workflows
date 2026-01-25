@@ -405,7 +405,9 @@ project/
 
 ### Step 1: Find Project Structure
 
-```bash
+Use Glob tool to locate project files:
+
+```
 # Find xcodeproj
 Glob("**/*.xcodeproj")
 
@@ -413,14 +415,30 @@ Glob("**/*.xcodeproj")
 Glob("**/Resources") || Glob("**/Sources")
 ```
 
+Or via bash:
+```bash
+# Find xcodeproj
+find . -name "*.xcodeproj" -type d | head -1
+
+# Find existing Resources or Sources folder
+find . -name "Resources" -type d 2>/dev/null || find . -name "Sources" -type d 2>/dev/null
+```
+
 ### Step 2: Create Fonts Directory
 
 ```bash
-# Determine project root (parent of .xcodeproj)
-PROJECT_ROOT=$(dirname $(find . -name "*.xcodeproj" -type d | head -1))
+# Find xcodeproj and extract project info
+XCODEPROJ=$(find . -name "*.xcodeproj" -type d | head -1)
+if [ -z "$XCODEPROJ" ]; then
+    echo "Error: No .xcodeproj found"
+    exit 1
+fi
 
-# Create fonts directory
-mkdir -p "$PROJECT_ROOT/Resources/Fonts"
+PROJECT_ROOT=$(dirname "$XCODEPROJ")
+PROJECT_NAME=$(basename "$XCODEPROJ" .xcodeproj)
+
+# Create fonts directory inside project folder
+mkdir -p "$PROJECT_ROOT/$PROJECT_NAME/Resources/Fonts"
 ```
 
 ### Step 3: Download and Copy Fonts
@@ -431,8 +449,9 @@ curl -L "https://fonts.google.com/download?family={FontFamily}" -o /tmp/{FontFam
 unzip -o /tmp/{FontFamily}.zip -d /tmp/{FontFamily}
 
 # Copy TTF files (iOS prefers TTF/OTF)
-cp /tmp/{FontFamily}/static/*.ttf "$PROJECT_ROOT/Resources/Fonts/" 2>/dev/null || \
-cp /tmp/{FontFamily}/*.ttf "$PROJECT_ROOT/Resources/Fonts/"
+# Note: Uses PROJECT_ROOT and PROJECT_NAME from Step 2
+cp /tmp/{FontFamily}/static/*.ttf "$PROJECT_ROOT/$PROJECT_NAME/Resources/Fonts/" 2>/dev/null || \
+cp /tmp/{FontFamily}/*.ttf "$PROJECT_ROOT/$PROJECT_NAME/Resources/Fonts/"
 
 # Cleanup temp files
 rm -rf /tmp/{FontFamily}.zip /tmp/{FontFamily}
@@ -455,17 +474,22 @@ Add fonts to `Info.plist`:
 **Implementation:**
 
 ```bash
+# Info.plist is inside the project folder
+INFO_PLIST="$PROJECT_ROOT/$PROJECT_NAME/Info.plist"
+
 # Check if UIAppFonts key exists
-grep -q "UIAppFonts" "$PROJECT_ROOT/Info.plist"
+grep -q "UIAppFonts" "$INFO_PLIST"
 
 # If not, need to add it before closing </dict></plist>
 ```
 
-Or use PlistBuddy:
+Or use PlistBuddy (macOS built-in):
 ```bash
-/usr/libexec/PlistBuddy -c "Add :UIAppFonts array" "$PROJECT_ROOT/Info.plist" 2>/dev/null
-/usr/libexec/PlistBuddy -c "Add :UIAppFonts:0 string 'Fonts/Inter-Regular.ttf'" "$PROJECT_ROOT/Info.plist"
-/usr/libexec/PlistBuddy -c "Add :UIAppFonts:1 string 'Fonts/Inter-Medium.ttf'" "$PROJECT_ROOT/Info.plist"
+INFO_PLIST="$PROJECT_ROOT/$PROJECT_NAME/Info.plist"
+
+/usr/libexec/PlistBuddy -c "Add :UIAppFonts array" "$INFO_PLIST" 2>/dev/null
+/usr/libexec/PlistBuddy -c "Add :UIAppFonts:0 string 'Fonts/Inter-Regular.ttf'" "$INFO_PLIST"
+/usr/libexec/PlistBuddy -c "Add :UIAppFonts:1 string 'Fonts/Inter-Medium.ttf'" "$INFO_PLIST"
 # ... repeat for each font
 ```
 
@@ -501,11 +525,20 @@ extension Font {
 
 ### Important Notes
 
-1. **Xcode Project Update Required:** Fonts must be added to Xcode project manually or via script. The agent documents this requirement.
+1. **Xcode Project Update Required:** Fonts must be added to Xcode project manually or via script. The agent documents this requirement and provides guidance for users.
 
-2. **Font Names:** iOS uses the PostScript name, not filename. Check with:
+2. **Font Names:** iOS uses the PostScript name, not filename. On macOS, check with:
    ```bash
-   fc-scan --format "%{postscriptname}\n" Inter-Regular.ttf
+   # Using otool (macOS built-in)
+   otool -l Inter-Regular.ttf | grep -A2 "name"
+
+   # Or using Font Book (GUI)
+   # Open font in Font Book > Show Font Info > PostScript name
+
+   # Or using atos (for quick check)
+   mdls -name kMDItemFonts Inter-Regular.ttf
    ```
 
 3. **Bundle Target:** Ensure fonts are included in the app target's "Copy Bundle Resources" build phase.
+
+4. **File Location for Extension:** Create `FontExtensions.swift` in the same folder as other Swift files, typically `$PROJECT_ROOT/$PROJECT_NAME/Extensions/` or `$PROJECT_ROOT/$PROJECT_NAME/Utilities/`.
