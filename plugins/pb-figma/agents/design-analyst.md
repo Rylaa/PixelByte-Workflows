@@ -48,8 +48,9 @@ Use `TodoWrite` to track analysis progress through these steps:
 4. **Determine Implementation Strategy** - Plan semantic HTML, layout methods, responsive behavior
 5. **Map Design Tokens** - Convert tokens to CSS custom properties and Tailwind classes
 6. **Document Asset Requirements** - List all required assets with optimization notes
-7. **Create Implementation Checklist** - Generate actionable tasks for developers
-8. **Write Implementation Spec** - Output to `docs/figma-reports/{file_key}-spec.md`
+7. **Capture Layer Order** - Extract z-index hierarchy from Figma using absoluteBoundingBox coordinates
+8. **Create Implementation Checklist** - Generate actionable tasks for developers
+9. **Write Implementation Spec** - Output to `docs/figma-reports/{file_key}-spec.md`
 
 ## Analysis Process
 
@@ -220,6 +221,87 @@ For each component identified in the hierarchy:
 - Order tasks by dependency (setup before implementation)
 - Group related tasks together
 
+### 6. Layer Order Analysis
+
+Extract and document the z-index/layer hierarchy from Figma to ensure accurate rendering order in generated code.
+
+#### Why Layer Order Matters
+
+Figma's visual stacking order determines which elements appear on top. Without explicit layer order documentation:
+- Code generators may render components in arbitrary order
+- Visual positioning can be incorrect (e.g., page controls appearing at bottom instead of top)
+- Z-index conflicts occur when manually adjusting
+
+#### Extracting Layer Order from Figma
+
+Use the Figma MCP tools to query node details and absoluteBoundingBox coordinates:
+
+**Query Pattern:**
+```typescript
+// Get node details including absolute coordinates
+const nodeDetails = figma_get_node_details({
+  file_key: "{file_key}",
+  node_id: "{node_id}"
+});
+
+// Extract children and sort by Y coordinate (top to bottom)
+const children = nodeDetails.children.sort((a, b) =>
+  a.absoluteBoundingBox.y - b.absoluteBoundingBox.y
+);
+
+// Assign z-index values (higher = on top)
+const layerOrder = children.map((child, index) => ({
+  layer: child.name,
+  zIndex: 1000 - (index * 100),  // Top element gets highest zIndex
+  position: determinePosition(child.absoluteBoundingBox.y, containerHeight),
+  absoluteY: child.absoluteBoundingBox.y,
+  children: child.children?.map(c => c.name) || []
+}));
+```
+
+**Position Context Determination:**
+```typescript
+function determinePosition(absoluteY, containerHeight) {
+  const relativeY = absoluteY / containerHeight;
+  if (relativeY < 0.33) return 'top';
+  if (relativeY < 0.67) return 'center';
+  return 'bottom';
+}
+```
+
+#### Layer Order Rules
+
+1. **Higher zIndex = renders on top**
+   - Start from 1000 for top layer
+   - Decrement by 100 for each layer below
+   - Leaves room for intermediate layers (e.g., 950 for overlays)
+
+2. **Use absoluteBoundingBox.y for absoluteY**
+   - Captures exact pixel position from Figma
+   - Enables absolute positioning in code if needed
+   - Useful for fixed-position elements (headers, footers)
+
+3. **Document parent-child relationships**
+   - List child component names for each container
+   - Maintains component hierarchy
+   - Helps code generators create proper nesting
+
+4. **Note positioning context (top/center/bottom)**
+   - Helps with responsive layout decisions
+   - Guides choice between absolute vs relative positioning
+   - Useful for framework-specific implementations
+
+#### Critical: Query ALL Nodes
+
+Always query layer order for ALL child nodes, even if the design seems simple. Layer order matters for:
+- Overlays and modals
+- Navigation bars and headers
+- Floating action buttons
+- Page indicators and controls
+- Background images and decorative elements
+
+**Don't skip this step** - it's the difference between pixel-perfect and broken layouts.
+
 ## Output
 
 Write Implementation Spec to: `docs/figma-reports/{file_key}-spec.md`
@@ -245,6 +327,49 @@ Write Implementation Spec to: `docs/figma-reports/{file_key}-spec.md`
 │   └── {GrandchildComponent} (element)
 └── {ChildComponent} (element)
 ```
+
+## Layer Order
+
+**Purpose:** Explicit z-index/layer hierarchy from Figma. Determines rendering order in code.
+
+**Format:**
+```yaml
+layerOrder:
+  - layer: StatusBar
+    zIndex: 1000
+    position: top
+    absoluteY: 0
+    children: []
+
+  - layer: PageControl
+    zIndex: 900
+    position: top-below-status
+    absoluteY: 60
+    children:
+      - Dot1
+      - Dot2
+      - Dot3
+
+  - layer: HeroImage
+    zIndex: 500
+    position: center
+    absoluteY: 300
+    children: []
+
+  - layer: ContinueButton
+    zIndex: 100
+    position: bottom
+    absoluteY: 800
+    children: []
+```
+
+**Capture rules:**
+1. Higher zIndex = renders on top (StatusBar with zIndex 1000 appears above PageControl with zIndex 900)
+2. Use Figma API `absoluteBoundingBox.y` coordinate for absoluteY
+3. Document parent-child relationships in the children array
+4. Note positioning context (top/center/bottom) to guide layout implementation
+
+**Critical:** Layer order determines visual stacking. Code generators MUST respect this ordering to achieve pixel-perfect match with Figma design.
 
 ## Components
 
@@ -329,6 +454,16 @@ Write Implementation Spec to: `docs/figma-reports/{file_key}-spec.md`
 - [ ] Create component file: `{ComponentName}.tsx`
 - [ ] Add CSS custom properties to global styles
 - [ ] Import/configure required fonts
+
+### Spec Validation (Self-Check)
+- [ ] Implementation Spec file created at correct path
+- [ ] Component Hierarchy section complete
+- [ ] **Layer Order section complete with zIndex values**
+- [ ] **absoluteY coordinates documented for all layers**
+- [ ] Design Tokens extracted and mapped
+- [ ] Asset List generated with all required assets
+
+**If Layer Order is missing or incomplete:** Query Figma API again with `figma_get_node_details` for all children nodes to extract absoluteBoundingBox coordinates.
 
 ### Component Development
 - [ ] Implement {ComponentName} structure
