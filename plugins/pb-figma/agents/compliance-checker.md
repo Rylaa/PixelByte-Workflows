@@ -218,7 +218,7 @@ PageControl() {/* Last = top */}
 Verify components with `position: top` are actually positioned at top:
 
 **React:** Check for `top-0`, `top-[60px]`, or similar Tailwind classes
-**SwiftUI:** Check for `.frame(alignment: .top)` or `.offset(y: 60)`
+**SwiftUI:** Check for `.frame(alignment: .top)` or `.position(y: 60)`
 
 **Common mistakes:**
 - Component marked `position: top` in spec but has `bottom-0` class
@@ -237,9 +237,9 @@ Read("{component_file_path}")
 Grep("top-\\[?[0-9]+", path="{component_file_path}")
 Grep("bottom-\\[?[0-9]+", path="{component_file_path}")
 
-# For SwiftUI: Check alignment and offset
+# For SwiftUI: Check alignment and position
 Grep("\\.frame.*alignment.*\\.top", path="{component_file_path}")
-Grep("\\.offset\\(y:", path="{component_file_path}")
+Grep("\\.position\\(y:", path="{component_file_path}")
 
 # Verify absoluteY coordinates match spec
 Grep("absoluteY:", path="docs/figma-reports/{file_key}-spec.md")
