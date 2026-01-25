@@ -205,8 +205,10 @@ React code must have:
 
 SwiftUI code must have:
 ```swift
-ContinueButton()      {/* First = bottom */}
-PageControl() {/* Last = top */}
+// SwiftUI renders LAST element on TOP (reverse of JSX)
+// Order by zIndex ASCENDING (lowest first)
+ContinueButton()      {/* zIndex: 100 - renders behind */}
+PageControl()         {/* zIndex: 900 - renders on top */}
 ```
 
 **Validation result:**
@@ -233,6 +235,17 @@ Grep("layerOrder:", path="docs/figma-reports/{file_key}-spec.md")
 # Read component file and verify JSX element order
 Read("{component_file_path}")
 
+# Parse JSX component order (look for component tags in render/return)
+Grep("<(PageControl|ContinueButton|HeroImage)", path="{component_file_path}")
+
+# Verify order: Components should appear in zIndex descending order
+# First match = highest zIndex (renders on top)
+
+**Edge cases to handle:**
+- Wrapped components: `<div><ComponentName /></div>` counts as ComponentName
+- Conditional rendering: `{condition && <Component />}` - note as potential issue
+- Fragments: `<><Component /></>` - Component position still counts
+
 # For React: Check position classes
 Grep("top-\\[?[0-9]+", path="{component_file_path}")
 Grep("bottom-\\[?[0-9]+", path="{component_file_path}")
@@ -244,6 +257,12 @@ Grep("\\.position\\(y:", path="{component_file_path}")
 # Verify absoluteY coordinates match spec
 Grep("absoluteY:", path="docs/figma-reports/{file_key}-spec.md")
 ```
+
+**Edge Cases:**
+- **Same zIndex:** Components with identical zIndex can render in any order relative to each other
+- **Missing zIndex:** Components without explicit zIndex in spec should use document order
+- **Conditional rendering:** If component is conditionally rendered, note in report as WARNING
+- **Nested components:** layerOrder applies to direct children of the container frame
 
 ## Verification Process
 
