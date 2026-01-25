@@ -23,27 +23,51 @@
   ],
   "agents": [
     {
+      "id": "design-validator",
       "name": "design-validator",
+      "description": "Validates Figma designs for code generation readiness",
       "path": "../agents/design-validator.md"
     },
     {
+      "id": "design-analyst",
       "name": "design-analyst",
+      "description": "Analyzes design structure and creates implementation specs",
       "path": "../agents/design-analyst.md"
     },
     {
+      "id": "asset-manager",
       "name": "asset-manager",
+      "description": "Manages asset downloads and organization",
       "path": "../agents/asset-manager.md"
     },
     {
+      "id": "code-generator-react",
       "name": "code-generator-react",
+      "description": "Generates React/TypeScript/Tailwind code from Figma designs",
       "path": "../agents/code-generator-react.md"
     },
     {
+      "id": "code-generator-swiftui",
       "name": "code-generator-swiftui",
+      "description": "Generates SwiftUI code for iOS/macOS from Figma designs",
       "path": "../agents/code-generator-swiftui.md"
     },
     {
+      "id": "code-generator-vue",
+      "name": "code-generator-vue",
+      "description": "Generates Vue/TypeScript code from Figma designs",
+      "path": "../agents/code-generator-vue.md"
+    },
+    {
+      "id": "code-generator-kotlin",
+      "name": "code-generator-kotlin",
+      "description": "Generates Kotlin/Jetpack Compose code for Android from Figma designs",
+      "path": "../agents/code-generator-kotlin.md"
+    },
+    {
+      "id": "compliance-checker",
       "name": "compliance-checker",
+      "description": "Verifies generated code against design specs",
       "path": "../agents/compliance-checker.md"
     }
   ],
