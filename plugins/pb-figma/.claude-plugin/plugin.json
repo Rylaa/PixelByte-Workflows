@@ -53,18 +53,6 @@
       "path": "../agents/code-generator-swiftui.md"
     },
     {
-      "id": "code-generator-vue",
-      "name": "code-generator-vue",
-      "description": "Generates Vue/TypeScript code from Figma designs",
-      "path": "../agents/code-generator-vue.md"
-    },
-    {
-      "id": "code-generator-kotlin",
-      "name": "code-generator-kotlin",
-      "description": "Generates Kotlin/Jetpack Compose code for Android from Figma designs",
-      "path": "../agents/code-generator-kotlin.md"
-    },
-    {
       "id": "compliance-checker",
       "name": "compliance-checker",
       "description": "Verifies generated code against design specs",
