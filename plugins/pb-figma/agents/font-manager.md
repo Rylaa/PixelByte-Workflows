@@ -163,3 +163,93 @@ AskUserQuestion:
     - "Vue"
     - "All platforms"
 ```
+
+## Font Source Search
+
+Search for fonts in this priority order:
+
+### 1. Google Fonts (Primary)
+
+```
+WebFetch:
+  url: "https://fonts.google.com/download?family={font_family}"
+  prompt: "Download the font family zip file"
+```
+
+Alternative API check:
+```
+WebFetch:
+  url: "https://fonts.googleapis.com/css2?family={font_family}:wght@{weights}"
+  prompt: "Get the font CSS with download URLs"
+```
+
+**Google Fonts URL Pattern:**
+- CSS: `https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap`
+- Download: `https://fonts.google.com/download?family=Inter`
+
+### 2. Font Squirrel (Fallback 1)
+
+```
+WebFetch:
+  url: "https://www.fontsquirrel.com/fonts/{font-family-slug}"
+  prompt: "Check if font exists and get download link"
+```
+
+**Note:** Font Squirrel uses kebab-case slugs (e.g., "open-sans")
+
+### 3. Adobe Fonts Check (Fallback 2)
+
+```
+WebFetch:
+  url: "https://fonts.adobe.com/fonts/{font-family-slug}"
+  prompt: "Check if font exists on Adobe Fonts"
+```
+
+**Note:** Adobe Fonts requires subscription. If found here, report to user but don't auto-download.
+
+### Search Algorithm
+
+```
+For each font_family in fonts_required:
+  1. Try Google Fonts API
+     - If found: mark source = "google", get download URL
+     - If not found: continue
+
+  2. Try Font Squirrel
+     - If found: mark source = "fontsquirrel", get download URL
+     - If not found: continue
+
+  3. Check Adobe Fonts
+     - If found: mark source = "adobe", note "requires subscription"
+     - If not found: continue
+
+  4. If no source found:
+     - Mark as "not_found"
+     - Prepare fallback suggestion
+```
+
+### Fallback Font Mapping
+
+When a font cannot be found, suggest alternatives:
+
+| Original Font | Fallback Options |
+|---------------|------------------|
+| SF Pro | Inter, -apple-system, system-ui |
+| SF Pro Display | Inter, -apple-system |
+| SF Pro Text | Inter, -apple-system |
+| Helvetica Neue | Inter, Arial, sans-serif |
+| Roboto | Inter, -apple-system, sans-serif |
+| Open Sans | Inter, Source Sans Pro, sans-serif |
+| Montserrat | Poppins, Inter, sans-serif |
+| Playfair Display | Merriweather, Georgia, serif |
+| Custom/Unknown | Inter, system-ui, sans-serif |
+
+When fallback is needed:
+```
+AskUserQuestion:
+  question: "Font '{original}' not found in free sources. What should I do?"
+  options:
+    - "Use fallback: {fallback_suggestion}"
+    - "Skip this font (use system default)"
+    - "I'll provide the font file manually"
+```
