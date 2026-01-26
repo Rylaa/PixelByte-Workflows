@@ -8,6 +8,7 @@ tools:
   - mcp__plugin_pb-figma_pixelbyte-figma-mcp__figma_get_styles
   - mcp__plugin_pb-figma_pixelbyte-figma-mcp__figma_list_assets
   - mcp__plugin_pb-figma_pixelbyte-figma-mcp__figma_get_screenshot
+  - Bash
   - Write
   - TodoWrite
 ---
@@ -101,7 +102,10 @@ Use `TodoWrite` to track validation progress through these steps:
    - Add `iconType` field: `THEMATIC` or `STATUS_INDICATOR`
 7. **Deep Inspection** - For each component, use `figma_get_node_details`
 8. **Resolve Gaps** - Attempt to fill missing data with additional MCP calls
-9. **Ensure Output Directory** - Create `docs/figma-reports/` if it does not exist
+9. **Ensure Output Directory** - Create directory and file:
+   ```bash
+   mkdir -p docs/figma-reports && touch docs/figma-reports/{file_key}-validation.md
+   ```
 10. **Generate Report** - Write Validation Report to `docs/figma-reports/{file_key}-validation.md`
 
 ## Output: Validation Report
