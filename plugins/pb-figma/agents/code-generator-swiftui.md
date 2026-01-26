@@ -1,6 +1,6 @@
 ---
 name: code-generator-swiftui
-description: Generates production-ready SwiftUI code from Implementation Spec. Detects Xcode/SPM projects, uses Figma MCP for base generation, enhances with SwiftUI best practices, accessibility, and iOS design patterns.
+description: Generates production-ready SwiftUI code from Implementation Spec. Detects Xcode/SPM projects, uses Figma MCP for base generation, enhances with SwiftUI best practices, accessibility, and iOS design patterns. Requires iOS 15.0+ for gradient text support (.foregroundStyle()).
 tools:
   - Read
   - Write
@@ -219,6 +219,115 @@ Text(title)
 // ✅ CORRECT - Applying opacity from spec
 .stroke(Color.white.opacity(0.4), lineWidth: 1.0)
 ```
+
+##### Apply Gradients from Spec
+
+**Read gradient from Implementation Spec "Text with Gradient" section:**
+
+```markdown
+### Text with Gradient
+- **Gradient Type:** ANGULAR
+- **Stops:** 7 color stops with positions
+  - Position 0.1673: #bc82f3 (purple)
+  - Position 0.2365: #f4b9ea (pink)
+  ...
+```
+
+**Map to SwiftUI gradient:**
+
+```swift
+Text("Type a scene to generate your video")
+    .font(.system(size: 14, weight: .regular))
+    .foregroundStyle(
+        AngularGradient(
+            stops: [
+                Gradient.Stop(color: Color(hex: "#bc82f3"), location: 0.1673),
+                Gradient.Stop(color: Color(hex: "#f4b9ea"), location: 0.2365),
+                Gradient.Stop(color: Color(hex: "#8d98ff"), location: 0.3518),
+                Gradient.Stop(color: Color(hex: "#aa6eee"), location: 0.5815),
+                Gradient.Stop(color: Color(hex: "#ff6777"), location: 0.697),
+                Gradient.Stop(color: Color(hex: "#ffba71"), location: 0.8095),
+                Gradient.Stop(color: Color(hex: "#c686ff"), location: 0.9241)
+            ],
+            center: .center
+        )
+    )
+```
+
+**Gradient type mapping:**
+
+| Figma Type | SwiftUI Type | Example |
+|------------|---------------|---------|
+| LINEAR | `LinearGradient` | `LinearGradient(stops: [...], startPoint: .top, endPoint: .bottom)` |
+| RADIAL | `RadialGradient` | `RadialGradient(stops: [...], center: .center, startRadius: 0, endRadius: 100)` |
+| ANGULAR | `AngularGradient` | `AngularGradient(stops: [...], center: .center)` |
+| DIAMOND | `AngularGradient` | `AngularGradient(stops: [...], center: .center)` (treat as angular) |
+
+**For LINEAR gradients, convert angle to startPoint/endPoint:**
+
+| Angle | startPoint | endPoint | Direction |
+|-------|------------|----------|-----------|
+| 0° | `.leading` | `.trailing` | Left to right |
+| 90° | `.top` | `.bottom` | Top to bottom |
+| 180° | `.trailing` | `.leading` | Right to left |
+| 270° | `.bottom` | `.top` | Bottom to top |
+| 45° | `.topLeading` | `.bottomTrailing` | Diagonal |
+| 135° | `.topTrailing` | `.bottomLeading` | Diagonal |
+
+**Example LINEAR gradient:**
+
+```swift
+Text("Gradient text")
+    .foregroundStyle(
+        LinearGradient(
+            stops: [
+                Gradient.Stop(color: Color(hex: "#FF0000"), location: 0.0),
+                Gradient.Stop(color: Color(hex: "#0000FF"), location: 1.0)
+            ],
+            startPoint: .leading,
+            endPoint: .trailing
+        )
+    )
+```
+
+**Example RADIAL gradient:**
+
+```swift
+Text("Radial gradient")
+    .foregroundStyle(
+        RadialGradient(
+            stops: [
+                Gradient.Stop(color: Color(hex: "#FFFF00"), location: 0.0),
+                Gradient.Stop(color: Color(hex: "#FF00FF"), location: 1.0)
+            ],
+            center: .center,
+            startRadius: 0,
+            endRadius: 100
+        )
+    )
+```
+
+**Critical rules:**
+
+1. **Read ALL stops from Implementation Spec** - don't truncate gradient (some have 7+ stops)
+2. **Use `.foregroundStyle()` NOT `.foregroundColor()`** - `.foregroundColor()` doesn't support gradients
+3. **Preserve exact stop positions** - don't round to 0.0/0.5/1.0, use exact values from spec (e.g., 0.1673)
+4. **Use `Color(hex:)` for stop colors** - requires Color+Hex extension from Task 5
+5. **Minimum iOS 15** - `.foregroundStyle()` requires iOS 15+, add `@available(iOS 15.0, *)` if needed
+
+**Common mistakes:**
+
+❌ `.foregroundColor(LinearGradient(...))` → Won't compile
+✅ `.foregroundStyle(LinearGradient(...))`
+
+❌ Hardcoding only 2-3 stops → Loses gradient fidelity
+✅ Reading all stops from spec
+
+❌ Rounding positions to 0.0, 0.5, 1.0 → Shifts gradient balance
+✅ Using exact positions like 0.1673, 0.2365
+
+❌ Using `.opacity()` with gradients → Applies to entire gradient uniformly
+✅ Using hex colors with alpha channel for per-stop opacity (e.g., `#80FF0000`)
 
 ##### Use Proper View Structure
 
