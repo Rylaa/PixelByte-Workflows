@@ -169,22 +169,25 @@ Custom → rounded-[Xpx]
 
 #### Opacity Handling
 
-Extract opacity for all visual properties from `figma_get_design_tokens`:
+Extract opacity for all visual properties from `figma_get_node_details`:
 
 **Query Pattern:**
 ```typescript
-const tokens = figma_get_design_tokens({
+const nodeDetails = figma_get_node_details({
   file_key: "{file_key}",
-  node_id: "{node_id}",
-  include_colors: true
+  node_id: "{node_id}"
 });
 
-// Extract opacity from tokens
-tokens.colors.forEach(colorToken => {
-  if (colorToken.opacity && colorToken.opacity < 1.0) {
-    // Add to "Design Tokens" table with Opacity column and `.opacity(X)` in Usage
-  }
-});
+// Extract BOTH fill opacity and node opacity
+const fillOpacity = nodeDetails.fills?.[0]?.opacity ?? 1.0;  // Default to 1.0 if undefined
+const nodeOpacity = nodeDetails.opacity ?? 1.0;              // Default to 1.0 if undefined
+
+// Calculate effective opacity (compound multiplication)
+const effectiveOpacity = fillOpacity * nodeOpacity;
+
+// Example:
+// fills[0].opacity = 0.4, node.opacity = 1.0 → effective = 0.4
+// fills[0].opacity = 0.5, node.opacity = 0.8 → effective = 0.4
 ```
 
 **In Implementation Spec - Add Opacity Column:**
@@ -212,12 +215,19 @@ Add to Implementation Spec if detected:
 ```
 
 **Opacity extraction rules:**
-- **Always include Opacity column** in Design Tokens table for all colors
+- **Always extract BOTH opacities:** fills[0].opacity AND node.opacity from `figma_get_node_details`
+- **Calculate effective opacity:** effectiveOpacity = fillOpacity × nodeOpacity
+- **Always include Opacity column** in Design Tokens table showing effective opacity
 - `opacity: 1.0` → Omit `.opacity()` modifier in Usage column (default SwiftUI behavior)
-- `opacity: 0.01 - 0.99` → Include `.opacity(X)` modifier in Usage column
+- `opacity: 0.01 - 0.99` → Include `.opacity(X)` modifier in Usage column with effective value
 - `opacity: 0.0` → Element is fully transparent (invisible) - verify this is intentional
 - Border/stroke opacity < 0.8 → Add warning to Design Warnings section
 - Text opacity < 1.0 → Add warning to Design Warnings section
+
+**Calculation examples:**
+- fills[0].opacity=0.4, node.opacity=1.0 → effective=0.4 → Usage: `.stroke(Color.white.opacity(0.4))`
+- fills[0].opacity=0.5, node.opacity=0.8 → effective=0.4 → Usage: `.opacity(0.4)`
+- fills[0].opacity=undefined, node.opacity=0.6 → effective=0.6 → Usage: `.opacity(0.6)`
 
 #### Gradient Detection
 
