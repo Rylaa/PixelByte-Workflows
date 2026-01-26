@@ -174,6 +174,8 @@ Color.primary
 
 **Read opacity from Implementation Spec Design Tokens table:**
 
+The Usage column contains the **complete modifier chain** to apply to your SwiftUI view. Copy this exactly as shown.
+
 When Implementation Spec includes Opacity column:
 
 ```markdown
@@ -183,6 +185,8 @@ When Implementation Spec includes Opacity column:
 ```
 
 **Generate SwiftUI code with opacity modifier:**
+
+*Note: Examples below use `Color(hex:)` which requires a custom extension. See Task 5 for Color+Hex extension implementation. Alternatively, use standard SwiftUI: `Color(red:green:blue:).opacity(X)`*
 
 ```swift
 // Border with opacity from spec
@@ -200,10 +204,11 @@ Text(title)
 
 **CRITICAL RULES:**
 
-1. **Never ignore opacity values** - they are intentional design choices
-2. **Read from Opacity column** - don't hardcode `opacity(1.0)`
-3. **Default to 1.0** - if Opacity column missing, don't add `.opacity()` modifier
-4. **Copy from Usage column** - Implementation Spec shows exact SwiftUI code
+1. **Primary source: Usage column** - Copy the ready-to-use SwiftUI code shown in Usage column
+2. **Never ignore opacity modifiers** - If Usage shows `.opacity(X)`, include it in generated code
+3. **Opacity column is reference only** - Shows the numeric value, but Usage column has correct implementation
+4. **When opacity is 1.0** - Usage column won't include `.opacity()` modifier (SwiftUI default)
+5. **When opacity is 0.0** - Element is fully transparent (invisible). Verify this is intentional or add TODO comment
 
 **Common mistake to avoid:**
 
