@@ -50,6 +50,7 @@ For each node and its children, verify:
 - [ ] Icons identified with node IDs
 - [ ] Vectors identified (if any)
 - [ ] Export settings checked
+- [ ] **Duplicate-named icons classified** (if multiple icons share same name)
 
 ### 4. Missing Data Resolution
 If any data is unclear or missing:
@@ -91,10 +92,17 @@ Use `TodoWrite` to track validation progress through these steps:
    - Use format: `{file_key}-{YYYYMMDD-HHmmss}.png`
 4. **Extract Tokens** - Use `figma_get_design_tokens` for colors, typography, spacing
 5. **List Assets** - Use `figma_list_assets` to catalog images, icons, vectors
-6. **Deep Inspection** - For each component, use `figma_get_node_details`
-7. **Resolve Gaps** - Attempt to fill missing data with additional MCP calls
-8. **Ensure Output Directory** - Create `docs/figma-reports/` if it does not exist
-9. **Generate Report** - Write Validation Report to `docs/figma-reports/{file_key}-validation.md`
+6. **Classify Duplicate Icons** - If multiple icons share the same name:
+   - Use `figma_get_node_details` on each icon's parent container
+   - Determine icon position in layout (leading vs trailing)
+   - Add `iconPosition` field to asset inventory:
+     - `leading` = Thematic icon (action representation)
+     - `trailing` = Status indicator (checkmark, chevron)
+   - Add `iconType` field: `THEMATIC` or `STATUS_INDICATOR`
+7. **Deep Inspection** - For each component, use `figma_get_node_details`
+8. **Resolve Gaps** - Attempt to fill missing data with additional MCP calls
+9. **Ensure Output Directory** - Create `docs/figma-reports/` if it does not exist
+10. **Generate Report** - Write Validation Report to `docs/figma-reports/{file_key}-validation.md`
 
 ## Output: Validation Report
 
@@ -145,10 +153,12 @@ Write to: `docs/figma-reports/{file_key}-validation.md`
 | shadow-sm | drop-shadow | 0 1px 2px rgba(0,0,0,0.05) |
 
 ## Assets Inventory
-| Asset | Type | Node ID | Export Format |
-|-------|------|---------|---------------|
-| logo | image | 1:234 | SVG |
-| hero-bg | image | 1:567 | PNG |
+| Asset | Type | Node ID | Export Format | Position | Icon Type |
+|-------|------|---------|---------------|----------|-----------|
+| logo | image | 1:234 | SVG | - | - |
+| hero-bg | image | 1:567 | PNG | - | - |
+| card-icon-1 | icon | 1:890 | SVG | leading | THEMATIC |
+| card-check-1 | icon | 1:891 | SVG | trailing | STATUS_INDICATOR |
 
 ## Node Hierarchy
 ```

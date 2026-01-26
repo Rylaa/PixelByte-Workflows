@@ -2,6 +2,24 @@
 
 All notable changes to the pb-figma plugin will be documented in this file.
 
+## [1.4.1] - 2026-01-26
+
+### Added
+- **Card Icon Classification** - Design Analyst now classifies icons by position (leading=thematic, trailing=status indicator)
+- **Figma MCP Access for Design Analyst** - Agent can now query Figma API directly to verify ambiguous assets
+- **Duplicate Icon Handling** - Design Validator detects and classifies duplicate-named icons
+- **Asset Position/Type Columns** - Validation Report now includes `Position` and `Icon Type` for each asset
+- **TODO.md** - Plugin improvement roadmap with figma_list_assets enhancement proposals
+
+### Fixed
+- **Wrong Card Icons Bug** - Design Analyst no longer assigns trailing checkmark icons as card thematic icons
+- **HStack Layout Analysis** - Agents now correctly identify leading vs trailing elements in card layouts
+
+### Changed
+- Design Analyst process now includes "Validate Card Icons" step (Step 7)
+- Design Validator process now includes "Classify Duplicate Icons" step (Step 6)
+- Asset inventory format extended with Position and Icon Type columns
+
 ## [1.4.0] - 2026-01-26
 
 ### Added

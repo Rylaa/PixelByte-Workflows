@@ -6,6 +6,8 @@ tools:
   - Write
   - Glob
   - TodoWrite
+  - mcp__plugin_pb-figma_pixelbyte-figma-mcp__figma_get_node_details
+  - mcp__plugin_pb-figma_pixelbyte-figma-mcp__figma_get_file_structure
 ---
 
 # Design Analyst Agent
@@ -48,9 +50,14 @@ Use `TodoWrite` to track analysis progress through these steps:
 4. **Determine Implementation Strategy** - Plan semantic HTML, layout methods, responsive behavior
 5. **Map Design Tokens** - Convert tokens to CSS custom properties and Tailwind classes
 6. **Document Asset Requirements** - List all required assets with optimization notes
-7. **Capture Layer Order** - Extract z-index hierarchy from Figma using absoluteBoundingBox coordinates
-8. **Create Implementation Checklist** - Generate actionable tasks for developers
-9. **Write Implementation Spec** - Output to `docs/figma-reports/{file_key}-spec.md`
+7. **Validate Card Icons** - For card/list components, verify icon node IDs:
+   - Check if Validation Report has duplicate-named assets
+   - If yes, use `figma_get_node_details` to query card children
+   - Classify icons by position (leading=thematic, trailing=status)
+   - Use LEADING icon node IDs for card action icons
+8. **Capture Layer Order** - Extract z-index hierarchy from Figma using absoluteBoundingBox coordinates
+9. **Create Implementation Checklist** - Generate actionable tasks for developers
+10. **Write Implementation Spec** - Output to `docs/figma-reports/{file_key}-spec.md`
 
 ## Analysis Process
 
@@ -70,6 +77,47 @@ For each component, identify:
 - **Type**: Container / Atomic / Composite / Repeated
 - **Children**: Nested components
 - **Variants**: Different states or variations (hover, active, disabled)
+
+#### Card/List Item Icon Classification
+
+**CRITICAL:** When analyzing card or list item components with multiple icons, you MUST classify icons by their POSITION in the layout:
+
+| Position | Icon Type | Purpose | Examples |
+|----------|-----------|---------|----------|
+| LEFT (leading) | Thematic Icon | Represents the action/content | Clock, Flask, Folder, User |
+| RIGHT (trailing) | Status Indicator | Shows state or navigation | Checkmark, Chevron, Arrow |
+
+**Detection Rules:**
+
+1. **Analyze HStack/Row layout order:**
+   ```
+   HStack {
+     [Icon A]      ← LEADING = Thematic icon (action representation)
+     [TextContent] ← Middle content
+     [Icon B]      ← TRAILING = Status indicator (checkmark/chevron)
+   }
+   ```
+
+2. **Identify checkmark patterns in SVG:**
+   - Path pattern: `M...L...L...` forming a "✓" shape
+   - Common checkmark: `M19.7 24.5L22.9 27.7L29.3 21.3`
+   - Yellow circle + checkmark = Completion indicator
+
+3. **Cross-reference Validation Report assets:**
+   - If multiple assets have SAME generic name (e.g., "Frame 2121316303"):
+     - DO NOT blindly use these node IDs
+     - Query node positions relative to card layout
+     - Classify by position (leading vs trailing)
+
+4. **Asset naming in Implementation Spec:**
+   ```markdown
+   | Asset | Filename | Node ID | Type | Position |
+   |-------|----------|---------|------|----------|
+   | Card 1 Icon | icon-card-1.svg | {LEADING_NODE_ID} | THEMATIC | leading |
+   | Card 1 Check | icon-check.svg | {TRAILING_NODE_ID} | STATUS | trailing |
+   ```
+
+**WARNING:** Never assign a trailing checkmark icon as a card's thematic icon. The spec MUST use LEADING icons for card action representation.
 
 ### 2. Implementation Strategy
 
