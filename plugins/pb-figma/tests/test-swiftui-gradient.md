@@ -49,21 +49,21 @@ Text("Type a scene to generate your video")
 3. **Exact locations** - 4-decimal precision (0.1673 not 0.17)
 4. **Gradient.Stop format** - Must use Gradient.Stop(color:location:)
 
-## Current Behavior
+## Previous Behavior (Fixed)
 
-**Bug found in code-generator-swiftui.md line 278:**
+**Bug that was found and fixed in code-generator-swiftui.md line 278:**
 
 ```swift
-// ❌ CURRENT (line 278) - Loses decimal precision
+// ❌ BEFORE FIX - Lost decimal precision
 Gradient.Stop(color: Color(hex: "#ff6777"), location: 0.697),
 
-// ✅ SHOULD BE - Exact 4-decimal precision
+// ✅ AFTER FIX - Exact 4-decimal precision
 Gradient.Stop(color: Color(hex: "#ff6777"), location: 0.6970),
 ```
 
-**Issue:** The example gradient at lines 269-285 shows `0.697` instead of `0.6970`, losing the trailing zero. This sets incorrect precedent for code generation.
+**Issue:** The example gradient originally showed `0.697` instead of `0.6970`, losing the trailing zero. This caused pixel-level rendering differences from the Figma design.
 
-**Impact:** Generated code may drop trailing zeros in gradient stop locations, causing subtle rendering differences from Figma design.
+**Impact:** Generated SwiftUI code would not match pixel-perfect Figma designs for gradients with trailing-zero locations.
 
 **Other findings:**
 - ✅ Correctly uses `.foregroundStyle()` (line 271)
