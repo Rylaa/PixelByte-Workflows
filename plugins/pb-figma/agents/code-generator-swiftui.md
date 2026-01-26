@@ -170,6 +170,51 @@ Color("PrimaryColor")
 Color.primary
 ```
 
+##### Apply Opacity from Spec
+
+**Read opacity from Implementation Spec Design Tokens table:**
+
+When Implementation Spec includes Opacity column:
+
+```markdown
+| Property | Color | Opacity | Usage |
+|----------|-------|---------|-------|
+| Border | #ffffff | 0.4 | `.stroke(Color.white.opacity(0.4))` |
+```
+
+**Generate SwiftUI code with opacity modifier:**
+
+```swift
+// Border with opacity from spec
+RoundedRectangle(cornerRadius: 12)
+    .stroke(Color.white.opacity(0.4), lineWidth: 1.0)
+
+// Background with opacity
+Rectangle()
+    .fill(Color(hex: "#150200").opacity(0.8))
+
+// Text with opacity
+Text(title)
+    .foregroundColor(Color(hex: "#333333").opacity(0.9))
+```
+
+**CRITICAL RULES:**
+
+1. **Never ignore opacity values** - they are intentional design choices
+2. **Read from Opacity column** - don't hardcode `opacity(1.0)`
+3. **Default to 1.0** - if Opacity column missing, don't add `.opacity()` modifier
+4. **Copy from Usage column** - Implementation Spec shows exact SwiftUI code
+
+**Common mistake to avoid:**
+
+```swift
+// ❌ WRONG - Ignoring opacity from spec
+.stroke(Color.white, lineWidth: 1.0)
+
+// ✅ CORRECT - Applying opacity from spec
+.stroke(Color.white.opacity(0.4), lineWidth: 1.0)
+```
+
 ##### Use Proper View Structure
 
 Ensure proper SwiftUI View protocol implementation:
