@@ -58,7 +58,11 @@ Use `TodoWrite` to track analysis progress through these steps:
    - Use LEADING icon node IDs for card action icons
 8. **Capture Layer Order** - Extract z-index hierarchy from Figma using absoluteBoundingBox coordinates
 9. **Create Implementation Checklist** - Generate actionable tasks for developers
-10. **Write Implementation Spec** - Output to `docs/figma-reports/{file_key}-spec.md`
+10. **Ensure Output File Exists** - Before writing, create file if needed:
+    ```bash
+    mkdir -p docs/figma-reports && touch docs/figma-reports/{file_key}-spec.md
+    ```
+11. **Write Implementation Spec** - Output to `docs/figma-reports/{file_key}-spec.md`
 
 ## Analysis Process
 
