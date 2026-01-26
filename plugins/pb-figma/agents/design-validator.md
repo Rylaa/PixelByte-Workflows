@@ -86,7 +86,7 @@ Determine final validation status based on these criteria:
 Use `TodoWrite` to track validation progress through these steps:
 
 1. **Parse URL** - Extract file_key and node_id
-2. **Get Structure** - Use `figma_get_file_structure` with depth=10
+2. **Get Structure** - Use `figma_get_file_structure` with depth=3 (max). For large files, use node_id to target specific sections.
 3. **Get Screenshot** - Capture visual reference with `figma_get_screenshot`
    - Save screenshot to: `docs/figma-reports/{file_key}-{timestamp}.png`
    - Use format: `{file_key}-{YYYYMMDD-HHmmss}.png`
@@ -222,3 +222,21 @@ If design tokens cannot be extracted:
 - **Timeout**: If an MCP call takes longer than expected, wait and retry once. If it fails again, document the timeout and continue with available data.
 - **Rate Limits**: If you receive rate limit errors (429), wait 5-10 seconds between subsequent calls. Batch requests where possible to minimize API calls.
 - **Large Files**: For files with many nodes (>100), consider validating in sections rather than all at once to avoid timeouts.
+
+### Large File Handling
+
+If `figma_get_file_structure` returns an error about result size:
+
+1. **Reduce depth:** Try depth=2, then depth=1
+2. **Target specific node:** Use node_id parameter to query subtree only
+3. **Use markdown format:** Set response_format="markdown" (smaller than JSON)
+4. **Split queries:** Query each top-level frame separately
+
+**Example for large file:**
+```
+# Instead of full file with depth=6
+figma_get_file_structure(file_key, depth=6)  ❌ TOO LARGE
+
+# Target specific node with lower depth
+figma_get_file_structure(file_key, node_id="3:217", depth=2)  ✅ SAFE
+```
