@@ -5,7 +5,50 @@ description: This skill handles pixel-perfect Figma design conversion to product
 
 # Figma-to-Code Pixel-Perfect Conversion
 
-This skill converts Figma designs to pixel-perfect production code using **Pixelbyte Figma MCP Server** with a **5-phase workflow**, **framework detection**, and **iterative validation**.
+This skill converts Figma designs to pixel-perfect production code using **Pixelbyte Figma MCP Server** with a **5-agent pipeline**, **framework detection**, and **iterative validation**.
+
+## ⚠️ CRITICAL: Agent Invocation Required
+
+**DO NOT use MCP tools directly.** This skill orchestrates specialized agents via `Task` tool.
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│  YOU MUST USE Task TOOL TO INVOKE AGENTS                        │
+│                                                                  │
+│  ❌ WRONG: Calling mcp__pixelbyte-figma-mcp__* directly         │
+│  ✅ RIGHT: Task(subagent_type="pb-figma:design-validator", ...) │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+**Invocation sequence:**
+
+```python
+# Step 1: Design Validator
+Task(subagent_type="pb-figma:design-validator",
+     prompt="Validate Figma URL: {url}")
+
+# Step 2: Design Analyst (MANDATORY - creates Implementation Spec)
+Task(subagent_type="pb-figma:design-analyst",
+     prompt="Create Implementation Spec from: docs/figma-reports/{file_key}-validation.md")
+
+# Step 3: Asset Manager
+Task(subagent_type="pb-figma:asset-manager",
+     prompt="Download assets from spec: docs/figma-reports/{file_key}-spec.md")
+
+# Step 4: Code Generator (framework-specific)
+Task(subagent_type="pb-figma:code-generator-{framework}",
+     prompt="Generate code from spec: docs/figma-reports/{file_key}-spec.md")
+
+# Step 5: Compliance Checker
+Task(subagent_type="pb-figma:compliance-checker",
+     prompt="Validate implementation against spec: docs/figma-reports/{file_key}-spec.md")
+```
+
+**Framework routing (Step 4):**
+- Swift/Xcode project → `code-generator-swiftui`
+- Android/Kotlin project → `code-generator-kotlin`
+- React/Next.js project → `code-generator-react`
+- Vue/Nuxt project → `code-generator-vue`
 
 ## Prerequisites
 
@@ -353,9 +396,18 @@ file_key: xHgE5Ab7cD9fG1hI
 node_id: 123:456
 ```
 
-## 5-Phase Workflow
+---
 
-### Phase 1: Context Acquisition
+# Agent Reference Documentation
+
+> ⚠️ **FOR AGENTS ONLY** - The following documentation is used BY the agents internally.
+> **DO NOT execute these phases directly.** Use the Task tool to invoke agents as shown above.
+
+---
+
+## 5-Phase Workflow (Agent Internal Reference)
+
+### Phase 1: Context Acquisition (Used by: design-validator, design-analyst)
 
 Upon receiving a Figma URL:
 
@@ -459,7 +511,7 @@ mcp__pixelbyte-figma-mcp__figma_get_code_connect_map({
 - PricingTable (node 901:234) → NEW
 ```
 
-### Phase 2: Mapping & Planning
+### Phase 2: Mapping & Planning (Used by: design-analyst)
 
 **Before writing code, create a plan:**
 
@@ -508,7 +560,7 @@ mcp__pixelbyte-figma-mcp__figma_get_code_connect_map({
 - ❌ Generate code directly from Figma API
 - ✅ ALWAYS create spec first, even for simple designs
 
-### Phase 3: Code Generation
+### Phase 3: Code Generation (Used by: code-generator-*)
 
 **Start with `figma_generate_code` output, then refine:**
 
@@ -546,7 +598,7 @@ mcp__pixelbyte-figma-mcp__figma_get_code_connect_map({
    - Mobile-first approach: base → `sm:` → `md:` → `lg:`
    - Single size in design: Add reasonable responsive behavior
 
-### Phase 4: Visual Validation (Claude Vision)
+### Phase 4: Visual Validation (Used by: compliance-checker)
 
 **Simple Approach:** Figma screenshot + Browser screenshot → Claude Vision comparison → TodoWrite difference list
 
@@ -724,7 +776,7 @@ mcp__pixelbyte-figma-mcp__figma_get_code_connect_map({
 
 **Detailed instructions:** See `references/visual-validation-loop.md`
 
-### Phase 5: Handoff
+### Phase 5: Handoff (Used by: compliance-checker)
 
 ⚠️ **VALIDATION GATE:**
 ```

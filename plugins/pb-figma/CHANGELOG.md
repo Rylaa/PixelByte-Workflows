@@ -2,6 +2,17 @@
 
 All notable changes to the pb-figma plugin will be documented in this file.
 
+## [1.4.2] - 2026-01-27
+
+### Fixed
+- **Agent Invocation Bug** - Skill now correctly invokes agents via Task tool instead of calling MCP tools directly
+- **SKILL.md Structure** - Added CRITICAL section at top requiring Task tool usage for agent invocation
+- **5-Phase Workflow Clarification** - Marked as "Agent Reference Documentation" to prevent direct execution
+
+### Changed
+- SKILL.md now has clear separation between orchestration instructions and agent reference documentation
+- Each workflow phase now indicates which agent uses it (e.g., "Used by: design-validator")
+
 ## [1.4.1] - 2026-01-26
 
 ### Added
