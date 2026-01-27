@@ -38,12 +38,13 @@ Use `TodoWrite` to track code generation progress through these steps:
 
 1. **Read Implementation Spec** - Load and parse the spec file
 2. **Verify Spec Status** - Check that spec is ready for code generation
-3. **Detect Xcode/SwiftUI Framework** - Identify Xcode project or SPM package
-4. **Confirm Framework with User** - Validate detection with user
-5. **Generate Component Code** - Use MCP to generate base code for each component
-6. **Enhance with SwiftUI Specifics** - Add property wrappers, modifiers, accessibility
-7. **Write Component Files** - Save to SwiftUI project structure
-8. **Update Spec with Results** - Add Generated Code table and next agent input
+3. **Build Asset Node Map** - Extract Asset Children from all components
+4. **Detect Xcode/SwiftUI Framework** - Identify Xcode project or SPM package
+5. **Confirm Framework with User** - Validate detection with user
+6. **Generate Component Code** - Use MCP to generate base code for each component
+7. **Enhance with SwiftUI Specifics** - Add property wrappers, modifiers, accessibility
+8. **Write Component Files** - Save to SwiftUI project structure
+9. **Update Spec with Results** - Add Generated Code table and next agent input
 
 ## Framework Detection
 
@@ -88,6 +89,85 @@ Options:
 | Detected | MCP Parameter |
 |----------|---------------|
 | Xcode/SwiftUI | `swiftui` |
+
+## Asset Node Map
+
+**CRITICAL:** Before generating code, build a map of asset nodes that should become Image() calls.
+
+### Step 1: Parse Asset Children from Spec
+
+Read all components and extract Asset Children entries:
+
+```
+For each component in "## Components" section:
+  Read "Asset Children" property
+  Parse format: IMAGE:asset-name:NodeID:width:height
+  Add to assetNodeMap: { nodeId: { name, width, height } }
+```
+
+**Example assetNodeMap:**
+```json
+{
+  "3:230": { "name": "icon-clock", "width": 32, "height": 32 },
+  "6:32": { "name": "growth-chart", "width": 354, "height": 132 }
+}
+```
+
+### Step 2: Read Downloaded Assets for Rendering Mode
+
+Cross-reference with "## Downloaded Assets" table:
+
+| Asset | Local Path | Fill Type | Template Compatible |
+|-------|------------|-----------|---------------------|
+| icon-clock | Assets.xcassets/icon-clock | #F2F20D | No - use .original |
+
+Add rendering mode to assetNodeMap:
+```json
+{
+  "3:230": { "name": "icon-clock", "width": 32, "height": 32, "renderingMode": ".original" }
+}
+```
+
+### Step 3: During Code Generation
+
+**CRITICAL:** When generating code for a component:
+
+1. Check if component contains any node IDs from assetNodeMap
+2. For asset nodes, DO NOT call figma_generate_code
+3. Instead, generate Image() code directly:
+
+```swift
+// Asset node 3:230 → Generate Image() instead of MCP code
+Image("icon-clock")
+    .resizable()
+    .renderingMode(.original)
+    .frame(width: 32, height: 32)
+```
+
+### Image() Generation Template
+
+**For Icons (small, typically < 64px):**
+```swift
+Image("{asset-name}")
+    .resizable()
+    .renderingMode({renderingMode})  // .original or .template
+    .frame(width: {width}, height: {height})
+```
+
+**For Illustrations (larger images):**
+```swift
+Image("{asset-name}")
+    .resizable()
+    .aspectRatio(contentMode: .fit)
+    .frame(width: {width}, height: {height})
+```
+
+**Rendering Mode Rules:**
+| Downloaded Assets "Template Compatible" | SwiftUI Rendering Mode |
+|----------------------------------------|------------------------|
+| No - use .original | `.renderingMode(.original)` |
+| Yes - use .template | `.renderingMode(.template)` + `.foregroundColor()` |
+| Not specified | `.renderingMode(.original)` (safe default) |
 
 ## Layer Order Parsing
 
@@ -541,6 +621,76 @@ Button("Submit") {
 .accessibilityLabel("Submit form")
 .accessibilityHint("Double tap to submit the form")
 .accessibilityAddTraits(.isButton)
+```
+
+##### Icon Rendering Mode Selection
+
+**CRITICAL:** Check Downloaded Assets table for fill information to determine correct rendering mode.
+
+**Read from Implementation Spec:**
+
+```markdown
+## Downloaded Assets
+
+| Asset | Local Path | Fill Type | Template Compatible |
+|-------|------------|-----------|---------------------|
+| icon-clock.svg | `.../icon-clock.svg` | #F2F20D | No - use .original |
+| icon-search.svg | `.../icon-search.svg` | none | Yes - use .template |
+```
+
+**Apply correct rendering mode based on Template Compatible column:**
+
+```swift
+// Downloaded Assets shows: icon-clock.svg has fill="#F2F20D" → Template Compatible: No
+Image("icon-clock")
+    .resizable()
+    .renderingMode(.original)  // Preserves hardcoded fill color from SVG
+    .frame(width: 32, height: 32)
+
+// Downloaded Assets shows: icon-search.svg has no fill → Template Compatible: Yes
+Image("icon-search")
+    .resizable()
+    .renderingMode(.template)
+    .foregroundColor(.viralYellow)  // Apply color via SwiftUI
+    .frame(width: 32, height: 32)
+```
+
+**Rules:**
+
+1. **If Template Compatible = No (hardcoded fill):**
+   - Use `.renderingMode(.original)`
+   - Do NOT apply `.foregroundColor()` - it will be ignored
+   - SVG's embedded fill color will be used
+
+2. **If Template Compatible = Yes (no fill or currentColor):**
+   - Use `.renderingMode(.template)`
+   - Apply `.foregroundColor()` from design tokens
+   - Color comes from SwiftUI, not SVG
+
+3. **If Downloaded Assets table missing Template Compatible column:**
+   - Default to `.renderingMode(.template)` with color from spec
+   - If icon appears wrong color, switch to `.renderingMode(.original)`
+
+**Common mistakes:**
+
+```swift
+// ❌ WRONG - Using template mode with hardcoded fill SVG
+Image("icon-clock")  // SVG has fill="#F2F20D"
+    .renderingMode(.template)
+    .foregroundColor(.viralYellow)  // Will show solid yellow, loses detail
+
+// ✅ CORRECT - Using original mode for hardcoded fill SVG
+Image("icon-clock")  // SVG has fill="#F2F20D"
+    .renderingMode(.original)  // SVG's #F2F20D will render correctly
+
+// ❌ WRONG - No rendering mode specified for icon
+Image("icon-clock")  // May render incorrectly in different contexts
+    .frame(width: 32, height: 32)
+
+// ✅ CORRECT - Always specify rendering mode explicitly
+Image("icon-clock")
+    .renderingMode(.original)  // or .template based on spec
+    .frame(width: 32, height: 32)
 ```
 
 #### 3. Write Component Files
