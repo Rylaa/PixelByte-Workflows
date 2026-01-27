@@ -45,6 +45,39 @@ Extract from the "Assets Required" table:
 
 **Note:** If the spec has incomplete asset information, document what is missing and proceed with available data.
 
+### Reading Flagged Frames from Spec
+
+Before processing regular assets, check for flagged frames requiring LLM analysis:
+
+```
+1. Read Implementation Spec from `docs/figma-reports/{file_key}-spec.md`
+2. Search for section "## Flagged for LLM Review"
+3. If section exists AND has table entries:
+   → Extract Node IDs from the table
+   → Process each with LLM Vision Analysis (section 2.1.2)
+   → Record decisions in spec
+4. If section doesn't exist or table is empty:
+   → Proceed with normal asset classification (section 2.1)
+```
+
+**Spec Section Format to Look For:**
+
+```markdown
+## Flagged for LLM Review
+
+| Node ID | Name | Trigger | Reason |
+|---------|------|---------|--------|
+| 6:32 | GrowthSection | Dark+Bright Siblings | Children 6:34 (dark) and 6:38 (bright) detected |
+```
+
+**Processing Order:**
+
+1. **First:** Process flagged frames with LLM Vision Analysis
+2. **Then:** Process remaining assets with normal classification
+3. **Finally:** Download all assets (both LLM-decided and normal)
+
+This ensures illustrations are properly identified before the standard download process begins.
+
 ## Process
 
 Use `TodoWrite` to track asset management progress through these steps:
