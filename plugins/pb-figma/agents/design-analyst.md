@@ -215,6 +215,45 @@ If no valid icon found at expected position:
 6. Use first matching node as card icon
 ```
 
+### 1.5 Read Frame Properties from Validation Report
+
+**CRITICAL:** Copy frame properties from Validation Report to each component.
+
+**Process:**
+1. Find component's Node ID in Validation Report "## Frame Properties" table
+2. Extract: Width, Height, Corner Radius, Border
+3. Add to component's property table
+
+**Corner Radius Parsing:**
+```
+"24px (uniform)" → cornerRadius: 24
+"16px (TL/TR), 0 (BL/BR)" → cornerRadius: { tl: 16, tr: 16, bl: 0, br: 0 }
+"TL:16 TR:16 BL:8 BR:8" → cornerRadius: { tl: 16, tr: 16, bl: 8, br: 8 }
+```
+
+**Border Parsing:**
+```
+"1px #FFFFFF40 inside" → border: { width: 1, color: "#FFFFFF", opacity: 0.4, align: "inside" }
+"2px #000000 outside" → border: { width: 2, color: "#000000", opacity: 1.0, align: "outside" }
+"none" → border: null
+```
+
+**Example Component with Frame Properties:**
+
+```markdown
+### ChecklistItemView
+
+| Property | Value |
+|----------|-------|
+| **Element** | HStack |
+| **Layout** | horizontal, spacing: 16 |
+| **Dimensions** | `width: 361, height: 80` |
+| **Corner Radius** | `12px` |
+| **Border** | `1px #FFFFFF opacity:0.4 inside` |
+| **Children** | IconFrame, ContentStack, CheckmarkIcon |
+| **Asset Children** | `IMAGE:icon-clock:3:230:32:32` |
+```
+
 ### 2. Implementation Strategy
 
 For each component, determine:
@@ -790,6 +829,9 @@ layerOrder:
 |----------|-------|
 | **Element** | `<section>` / `<div>` / etc. |
 | **Layout** | `flex flex-col` / `grid` / etc. |
+| **Dimensions** | `width: 361, height: 80` (from Frame Properties) |
+| **Corner Radius** | `12px` or `TL:16 TR:16 BL:0 BR:0` |
+| **Border** | `1px #FFFFFF opacity:0.4 inside` or `none` |
 | **Classes/Styles** | Full Tailwind class string |
 | **Props/Variants** | List of props or variant states |
 | **Children** | Child component names |
