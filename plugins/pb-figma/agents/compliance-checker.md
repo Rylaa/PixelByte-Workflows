@@ -113,7 +113,9 @@ Verify token usage matches spec:
 - [ ] **Colors** - All color tokens applied correctly
 - [ ] **Typography** - Font family, size, weight, line-height match
 - [ ] **Spacing** - Padding, margin, gap values match spec
-- [ ] **Border radius** - Corner radius values correct
+- [ ] **Frame dimensions** - Component width/height match spec Dimensions
+- [ ] **Corner radius** - Corner radius values match spec (uniform or per-corner)
+- [ ] **Border/stroke** - Border width, color, opacity match spec
 - [ ] **Shadows/Effects** - Shadow and blur effects applied
 
 **Verification Method:**

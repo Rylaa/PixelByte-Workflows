@@ -1115,6 +1115,9 @@ For each generated component, verify:
 - [ ] **Asset Children processed** - All IMAGE: entries converted to Image() calls
 - [ ] **Rendering modes correct** - .original for colored SVGs, .template for tintable
 - [ ] **Illustrations sized** - Large assets use aspectRatio, not fixed frame
+- [ ] **Frame dimensions applied** - .frame() modifiers match spec Dimensions
+- [ ] **Corner radius applied** - .clipShape() or .cornerRadius() match spec
+- [ ] **Border applied** - .overlay() with .stroke() for spec Border property
 - [ ] **Preview provider** - Includes PreviewProvider for Xcode previews
 
 ## SwiftUI-Specific Error Handling
