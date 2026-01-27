@@ -1101,9 +1101,8 @@ def _is_chart_or_illustration(node: Dict[str, Any]) -> bool:
     """Detect if a node is likely a chart or illustration (not an icon).
 
     Uses heuristics to identify charts/illustrations:
-    1. Has exportSettings configured (designer marked it for export)
-    2. Larger than typical icon size (>50px in either dimension)
-    3. Has multiple children (complex structure)
+    1. Has exportSettings configured AND larger than typical icon size
+    2. Large frame with multiple vector children (complex structure)
 
     Args:
         node: The node to check
@@ -1111,17 +1110,19 @@ def _is_chart_or_illustration(node: Dict[str, Any]) -> bool:
     Returns:
         True if the node appears to be a chart or illustration
     """
-    # If has exportSettings, it's likely a chart/illustration
-    if node.get('exportSettings'):
-        return True
-
     # Check size - charts are typically larger than icons
     abs_box = node.get('absoluteBoundingBox', {})
     width = abs_box.get('width', 0)
     height = abs_box.get('height', 0)
 
-    # Charts are usually >50px and have aspect ratio > 1.5:1 or < 1:1.5
+    # Icon size threshold - icons are typically <= 64px
+    is_icon_sized = width <= 64 and height <= 64
     is_large = width > 50 or height > 50
+
+    # If has exportSettings AND is larger than icon size, it's likely a chart/illustration
+    # Small icons can also have exportSettings, so we check size first
+    if node.get('exportSettings') and not is_icon_sized:
+        return True
 
     # Count children - charts typically have multiple elements
     children = node.get('children', [])
@@ -1189,8 +1190,10 @@ def _collect_all_assets(
         })
 
     # Smart icon detection - if this is an icon frame, add it and DON'T recurse
-    # Note: exportSettings already collected above, so early return is safe
-    if include_icons and _is_icon_frame(node):
+    # FIX: Skip icon classification if node is a chart/illustration
+    is_chart = _is_chart_or_illustration(node)
+
+    if include_icons and not is_chart and _is_icon_frame(node):
         abs_box = node.get('absoluteBoundingBox', {})
         assets['icons'].append({
             'nodeId': node_id,
