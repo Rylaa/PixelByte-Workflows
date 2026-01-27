@@ -2,6 +2,23 @@
 
 All notable changes to the pb-figma plugin will be documented in this file.
 
+## [1.6.0] - 2026-01-27
+
+### Fixed
+- **Chart/Illustration Detection** - MCP now properly detects nodes with `exportSettings` (fixes bar chart not downloading)
+- **Asset Classification** - Relaxed COMPLEX_VECTOR criteria (≥3 children, >50px) to catch smaller charts
+- **Icon Misclassification** - Nodes with exportSettings no longer incorrectly classified as icons
+
+### Added
+- `_is_chart_or_illustration()` helper function in MCP for improved asset detection
+- `CHART_ILLUSTRATION` asset type in asset-manager classification
+- `Has Export Settings` column in design-validator Assets Inventory
+- `Illustrations & Charts` validation checklist in design-validator
+
+### Changed
+- MCP version bumped to 2.5.0
+- Classification priority now places CHART_ILLUSTRATION highest
+
 ## [1.5.0] - 2026-01-27
 
 ### Added
