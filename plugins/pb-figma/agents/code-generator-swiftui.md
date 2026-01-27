@@ -1024,6 +1024,9 @@ For each generated component, verify:
 - [ ] **Accessibility** - VoiceOver labels, hints, traits
 - [ ] **Dynamic Type support** - Uses system font sizes or .dynamicTypeSize modifier
 - [ ] **Assets referenced** - Images/icons use Asset Catalog names or SF Symbols
+- [ ] **Asset Children processed** - All IMAGE: entries converted to Image() calls
+- [ ] **Rendering modes correct** - .original for colored SVGs, .template for tintable
+- [ ] **Illustrations sized** - Large assets use aspectRatio, not fixed frame
 - [ ] **Preview provider** - Includes PreviewProvider for Xcode previews
 
 ## SwiftUI-Specific Error Handling
