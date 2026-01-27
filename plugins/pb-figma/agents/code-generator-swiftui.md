@@ -39,12 +39,13 @@ Use `TodoWrite` to track code generation progress through these steps:
 1. **Read Implementation Spec** - Load and parse the spec file
 2. **Verify Spec Status** - Check that spec is ready for code generation
 3. **Build Asset Node Map** - Extract Asset Children from all components
-4. **Detect Xcode/SwiftUI Framework** - Identify Xcode project or SPM package
-5. **Confirm Framework with User** - Validate detection with user
-6. **Generate Component Code** - Use MCP to generate base code for each component
-7. **Enhance with SwiftUI Specifics** - Add property wrappers, modifiers, accessibility
-8. **Write Component Files** - Save to SwiftUI project structure
-9. **Update Spec with Results** - Add Generated Code table and next agent input
+4. **Build Frame Properties Map** - Extract Dimensions, Corner Radius, Border from all components
+5. **Detect Xcode/SwiftUI Framework** - Identify Xcode project or SPM package
+6. **Confirm Framework with User** - Validate detection with user
+7. **Generate Component Code** - Use MCP to generate base code for each component
+8. **Enhance with SwiftUI Specifics** - Add property wrappers, modifiers, accessibility
+9. **Write Component Files** - Save to SwiftUI project structure
+10. **Update Spec with Results** - Add Generated Code table and next agent input
 
 ## Framework Detection
 
@@ -200,6 +201,93 @@ If asset was in "Flagged for LLM Review" and decided as DOWNLOAD_AS_IMAGE:
 - Always use Illustration pattern
 - Add `.clipped()` to prevent overflow
 - Consider adding `.cornerRadius()` if parent has border radius
+
+## Frame Properties Map
+
+**CRITICAL:** Extract frame properties from each component to apply correct modifiers.
+
+### Step 1: Parse Frame Properties from Spec
+
+```
+For each component in "## Components" section:
+  Read "Dimensions" property → { width, height }
+  Read "Corner Radius" property → number or { tl, tr, bl, br }
+  Read "Border" property → { width, color, opacity, align } or null
+  Add to framePropertiesMap
+```
+
+**Example framePropertiesMap:**
+```json
+{
+  "ChecklistItemView": {
+    "dimensions": { "width": 361, "height": 80 },
+    "cornerRadius": 12,
+    "border": { "width": 1, "color": "#FFFFFF", "opacity": 0.4, "align": "inside" }
+  },
+  "GrowthSectionView": {
+    "dimensions": { "width": 361, "height": 180 },
+    "cornerRadius": { "tl": 16, "tr": 16, "bl": 0, "br": 0 },
+    "border": null
+  }
+}
+```
+
+### Step 2: Apply Frame Properties in SwiftUI
+
+**Dimensions → .frame() modifier:**
+```swift
+// From spec: Dimensions: width: 361, height: 80
+.frame(width: 361, height: 80)
+
+// For flexible containers (use maxWidth instead)
+.frame(maxWidth: 361)
+.frame(height: 80)
+```
+
+**Corner Radius → .clipShape() or .cornerRadius() modifier:**
+
+**Uniform radius:**
+```swift
+// From spec: Corner Radius: 12px
+.clipShape(RoundedRectangle(cornerRadius: 12))
+// OR
+.cornerRadius(12)
+```
+
+**Per-corner radius (iOS 16+):**
+```swift
+// From spec: Corner Radius: TL:16 TR:16 BL:0 BR:0
+.clipShape(
+    UnevenRoundedRectangle(
+        topLeadingRadius: 16,
+        bottomLeadingRadius: 0,
+        bottomTrailingRadius: 0,
+        topTrailingRadius: 16
+    )
+)
+```
+
+**Per-corner radius (iOS 15 compatibility):**
+```swift
+// Use custom Shape for iOS 15 support
+.clipShape(RoundedCorner(radius: 16, corners: [.topLeft, .topRight]))
+```
+
+**Border → .overlay() with RoundedRectangle.stroke():**
+```swift
+// From spec: Border: 1px #FFFFFF opacity:0.4 inside
+.overlay(
+    RoundedRectangle(cornerRadius: 12)
+        .stroke(Color.white.opacity(0.4), lineWidth: 1)
+)
+
+// For outside stroke, add padding adjustment
+.padding(1)  // Half of stroke width for outside alignment
+.overlay(
+    RoundedRectangle(cornerRadius: 12)
+        .stroke(Color.white.opacity(0.4), lineWidth: 2)
+)
+```
 
 ### Complete Example
 
