@@ -2,6 +2,19 @@
 
 All notable changes to the pb-figma plugin will be documented in this file.
 
+## [1.8.0] - 2026-01-27
+
+### Added
+- Asset Children marking in Implementation Spec (design-analyst)
+- Asset Node Map for Image() generation (code-generator-swiftui)
+- Automatic Image() code generation for asset nodes
+- Illustration vs Icon detection based on dimensions
+- Rendering mode selection from Downloaded Assets table
+
+### Fixed
+- Icons and illustrations now properly rendered in SwiftUI via Image() calls
+- Asset nodes no longer generate broken Path/Shape code
+
 ## [1.7.0] - 2026-01-27
 
 ### Added
