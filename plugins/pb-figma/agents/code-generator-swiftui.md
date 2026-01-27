@@ -226,6 +226,17 @@ ContinueButton()
 
 Process components from the Implementation Spec in dependency order (children before parents where applicable).
 
+#### 0. Check for Asset Children (BEFORE MCP)
+
+**CRITICAL:** Before calling figma_generate_code, check if component has Asset Children.
+
+```
+Read component's "Asset Children" property from spec
+If Asset Children exist:
+  → Component contains assets that need Image() calls
+  → Note asset positions for manual insertion
+```
+
 #### 1. Generate Base Code via MCP
 
 For each component with a Node ID:
@@ -238,7 +249,30 @@ figma_generate_code:
   - component_name: {ComponentName}
 ```
 
+**Note:** MCP may generate placeholder or broken code for asset nodes. This will be fixed in step 1.5.
+
 See [code-generator-base.md](./code-generator-base.md) for rate limit handling and MCP integration details.
+
+#### 1.5. Replace Asset Nodes with Image() Calls
+
+**CRITICAL:** After MCP generation, replace asset node code with proper Image() calls.
+
+For each entry in component's Asset Children:
+1. Parse: `IMAGE:asset-name:NodeID:width:height`
+2. Look up renderingMode from assetNodeMap
+3. Generate Image() code:
+   ```swift
+   Image("{asset-name}")
+       .resizable()
+       .renderingMode({renderingMode})
+       .frame(width: {width}, height: {height})
+   ```
+4. Insert into component at correct position in layout
+
+**Position Determination:**
+- Read component's Layout property (HStack, VStack, ZStack)
+- Asset Children order matches visual order (left-to-right, top-to-bottom)
+- First Asset Child = first in HStack/top in VStack
 
 #### 2. Enhance with SwiftUI Specifics
 
