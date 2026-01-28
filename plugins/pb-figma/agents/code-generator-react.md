@@ -884,12 +884,41 @@ export default Card;
 
 For each generated component, verify:
 
+**Structure & Hierarchy:**
 - [ ] **Hierarchy matches spec** - Component structure follows the spec hierarchy
-- [ ] **Semantic HTML used** - Proper elements (button, nav, article, etc.)
-- [ ] **Tokens applied** - Uses CSS custom properties or Tailwind tokens from spec
-- [ ] **TypeScript types** - Interface defined with proper prop types
-- [ ] **Accessibility** - ARIA attributes, focus states, alt text
-- [ ] **Assets referenced** - Images/icons use paths from Downloaded Assets section
+- [ ] **Semantic HTML used** - Proper elements (button, nav, article, section, etc.)
+- [ ] **TypeScript types** - Interface defined with proper prop types and JSDoc
+
+**Design Tokens:**
+- [ ] **Colors applied** - Uses CSS variables or Tailwind tokens from spec
+- [ ] **Opacity applied** - Includes `/opacity` modifiers where spec shows < 1.0
+- [ ] **Typography correct** - Font size, weight, line-height match spec
+
+**Frame Properties:**
+- [ ] **Dimensions applied** - `w-[Xpx]` or `max-w-[Xpx]` from spec Dimensions
+- [ ] **Corner radius applied** - `rounded-*` classes match spec Corner Radius
+- [ ] **Border applied** - `border` classes with correct color/opacity
+
+**Visual Effects:**
+- [ ] **Gradients rendered** - `bg-[linear-gradient(...)]` or style prop for complex
+- [ ] **Text decoration** - `underline`/`line-through` with correct color
+- [ ] **Shadows applied** - `shadow-*` classes match spec effects
+
+**Assets:**
+- [ ] **Assets referenced** - Images/icons use paths from Downloaded Assets
+- [ ] **Asset Node Map followed** - IMAGE: entries converted to proper img/Image
+- [ ] **Alt text provided** - All images have descriptive alt attributes
+- [ ] **Icon pattern correct** - lucide-react, SVG component, or img based on needs
+
+**Accessibility:**
+- [ ] **ARIA attributes** - aria-label, aria-describedby where needed
+- [ ] **Focus states** - `focus:ring-*` or `focus-visible:*` classes
+- [ ] **Keyboard navigable** - Interactive elements accessible via keyboard
+
+**Code Quality:**
+- [ ] **cn() used** - Class names merged with cn() utility
+- [ ] **Props typed** - All props have TypeScript types
+- [ ] **Default exports** - Named export + default export pattern
 
 ## React-Specific Error Handling
 
