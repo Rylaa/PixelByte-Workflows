@@ -2,6 +2,19 @@
 
 All notable changes to the pb-figma plugin will be documented in this file.
 
+## [1.12.0] - 2026-01-28
+
+### Added
+- **Visual Verification Gate** - Mandatory Figma vs browser screenshot comparison (≥95% match required for PASS)
+- **Accessibility Gate** - jest-axe, semantic HTML, keyboard accessibility, color contrast checks now REQUIRED for PASS
+- **Responsive Gate** - Mandatory testing at 3 breakpoints (375px, 768px, 1440px)
+- **figma_get_screenshot tool** - Added to compliance-checker for visual verification
+
+### Changed
+- Compliance Checker now has 3 mandatory gates before PASS status
+- Final Report Template includes Visual and Responsive columns
+- Pass/Fail criteria updated with explicit verification requirements
+
 ## [1.11.0] - 2026-01-28
 
 ### Added
