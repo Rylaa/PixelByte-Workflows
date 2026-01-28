@@ -221,10 +221,29 @@ If no valid icon found at expected position:
 
 **CRITICAL:** Copy frame properties from Validation Report to each component.
 
+**Mandatory Fields:**
+- Width (REQUIRED)
+- Height (REQUIRED)
+- Corner Radius (optional)
+- Border (optional)
+
 **Process:**
 1. Find component's Node ID in Validation Report "## Frame Properties" table
 2. Extract: Width, Height, Corner Radius, Border
-3. Add to component's property table
+3. **If Height is missing:** Query Figma API directly:
+   ```typescript
+   const nodeDetails = figma_get_node_details({
+     file_key: "{file_key}",
+     node_id: "{component_node_id}"
+   });
+   const height = nodeDetails.absoluteBoundingBox?.height;
+   ```
+4. Add to component's property table
+
+**Validation Rule:**
+- Every component with `type: FRAME` MUST have both width and height
+- Log warning if height is missing from Validation Report
+- Auto-fill height from Figma API query if not in Validation Report
 
 **Corner Radius Parsing:**
 ```
@@ -240,19 +259,19 @@ If no valid icon found at expected position:
 "none" → border: null
 ```
 
-**Example Component with Frame Properties:**
+**Example Component with Complete Dimensions:**
 
 ```markdown
-### ChecklistItemView
+### RoadmapCard
 
 | Property | Value |
 |----------|-------|
 | **Element** | HStack |
 | **Layout** | horizontal, spacing: 16 |
-| **Dimensions** | `width: 361, height: 80` |
-| **Corner Radius** | `12px` |
-| **Border** | `1px #FFFFFF opacity:0.4 inside` |
-| **Children** | IconFrame, ContentStack, CheckmarkIcon |
+| **Dimensions** | `width: 358, height: 64` |  ← MUST include height
+| **Corner Radius** | `32px` |
+| **Border** | `1px #414141 inside` |
+| **Children** | IconFrame, TitleText, CheckmarkIcon |
 | **Asset Children** | `IMAGE:icon-clock:3:230:32:32` |
 ```
 
