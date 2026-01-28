@@ -45,6 +45,8 @@ For each node and its children, verify:
 - [ ] Target node exists and is accessible
 - [ ] Node hierarchy is complete (all children loaded)
 - [ ] Auto Layout is used (WARN if absolute positioning)
+- [ ] **Auto Layout properties extracted** (layoutMode, axis alignment, padding, spacing, constraints)
+- [ ] **Min/Max dimensions captured** (minWidth, maxWidth, minHeight, maxHeight)
 
 ### 2. Design Tokens
 - [ ] Colors extracted (fills, strokes) with fill opacity and node opacity
@@ -276,6 +278,71 @@ if (overrides && overrides.length > 0 && overrides.some(v => v !== 0)) {
 
 **Known Figma API Bug:** `styleOverrideTable` may return empty objects `{}` for default-value overrides. Document these as `(default style)` — the design-analyst will use the node's base style for those characters.
 
+### 10. Auto Layout Property Extraction
+
+**CRITICAL:** Extract Auto Layout properties for ALL frames that use Auto Layout (`layoutMode` ≠ "NONE").
+
+**Query Pattern:**
+
+```typescript
+const nodeDetails = figma_get_node_details({
+  file_key: "{file_key}",
+  node_id: "{frame_node_id}"
+});
+
+// Auto Layout detection
+const layoutMode = nodeDetails.layoutMode; // "NONE" | "HORIZONTAL" | "VERTICAL"
+
+if (layoutMode !== "NONE") {
+  // Axis alignment
+  const primaryAxisAlign = nodeDetails.primaryAxisAlignItems;   // MIN | CENTER | MAX | SPACE_BETWEEN
+  const counterAxisAlign = nodeDetails.counterAxisAlignItems;   // MIN | CENTER | MAX | BASELINE
+
+  // Padding (individual sides)
+  const paddingTop = nodeDetails.paddingTop ?? 0;
+  const paddingRight = nodeDetails.paddingRight ?? 0;
+  const paddingBottom = nodeDetails.paddingBottom ?? 0;
+  const paddingLeft = nodeDetails.paddingLeft ?? 0;
+
+  // Item spacing
+  const itemSpacing = nodeDetails.itemSpacing ?? 0;
+
+  // Constraints (responsive behavior)
+  const constraints = nodeDetails.constraints; // { horizontal, vertical }
+  // Values: "MIN" | "CENTER" | "MAX" | "STRETCH" | "SCALE"
+
+  // Min/Max dimensions
+  const minWidth = nodeDetails.minWidth;
+  const maxWidth = nodeDetails.maxWidth;
+  const minHeight = nodeDetails.minHeight;
+  const maxHeight = nodeDetails.maxHeight;
+}
+```
+
+**Auto Layout Properties Table in Validation Report:**
+
+```markdown
+### Auto Layout Properties
+
+| Node ID | Node Name | Layout Mode | Primary Axis | Counter Axis | Padding (T/R/B/L) | Spacing | Constraints (H/V) | Min/Max Width |
+|---------|-----------|-------------|-------------|--------------|-------------------|---------|-------------------|---------------|
+| 3:100 | ContentArea | VERTICAL | MIN | CENTER | 16/16/16/16 | 16 | STRETCH/MIN | -/- |
+| 3:200 | CardRow | HORIZONTAL | MIN | CENTER | 16/16/16/16 | 16 | STRETCH/MIN | -/- |
+```
+
+**Padding Format:** `T/R/B/L` (e.g., `16/16/16/16` for uniform, `24/16/24/16` for different sides)
+
+**Constraints Format:** `H/V` (e.g., `STRETCH/MIN`)
+
+**Min/Max Format:** `{min}/{max}` or `-` if not set
+
+**Rules:**
+1. Only include frames where `layoutMode` ≠ "NONE"
+2. Extract ALL Auto Layout properties — do not omit padding or constraints
+3. Document uniform padding as `16/16/16/16` (not just `16`)
+4. Include constraints to inform responsive behavior
+5. Min/Max dimensions inform tablet adaptive patterns
+
 ## Status Determination
 
 - **FAIL**: File structure retrieval fails, `file_key` is invalid/inaccessible, critical node data cannot be fetched, or more than 5 unresolved items remain
@@ -343,6 +410,12 @@ Write to: `docs/figma-reports/{file_key}-validation.md`
 | {id}    | "{text}"    | {count} chars  | {style_details} |
 
 > **Note:** Empty style objects `{}` in styleOverrideTable indicate default-value overrides (known Figma API behavior). These characters use the node's base text style.
+
+### Auto Layout Properties
+
+| Node ID | Node Name | Layout Mode | Primary Axis | Counter Axis | Padding (T/R/B/L) | Spacing | Constraints (H/V) | Min/Max Width |
+|---------|-----------|-------------|-------------|--------------|-------------------|---------|-------------------|---------------|
+| {id} | {name} | {mode} | {primary} | {counter} | {padding} | {spacing} | {constraints} | {minmax} |
 
 ### Spacing
 | Token | Value |
