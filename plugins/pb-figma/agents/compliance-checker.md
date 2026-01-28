@@ -300,6 +300,52 @@ Grep("viewport", path="{layout_file_path}")
 
 **If responsive issues found:** Maximum status = WARN (cannot be PASS)
 
+### 8. Tablet Layout Verification (SwiftUI)
+
+Verify generated SwiftUI code follows adaptive layout patterns:
+
+- [ ] **Content width capped** - Root container has `.frame(maxWidth: N)` where N ≤ 700
+- [ ] **No hardcoded screen widths** - No `UIScreen.main.bounds.width` references
+- [ ] **No hardcoded iPhone widths** - No `.frame(width: 393)` or similar fixed widths
+- [ ] **Card lists adaptive** - Lists with 3+ repeating items use `LazyVGrid(.adaptive(...))` or justify VStack usage
+- [ ] **Flexible widths used** - Containers use `.frame(maxWidth: .infinity)` not fixed widths
+- [ ] **Padding uses system values** - `.padding(.horizontal, N)` not calculated from screen width
+
+**Verification Method (SwiftUI):**
+```
+# Check for hardcoded screen widths (should NOT exist)
+Grep("UIScreen\\.main\\.bounds", path="{component_file_path}")
+
+# Check for content width cap (SHOULD exist on root view)
+Grep("\\.frame\\(maxWidth:", path="{component_file_path}")
+
+# Check for fixed iPhone widths (should NOT exist)
+Grep("\\.frame\\(width: 393\\)", path="{component_file_path}")
+Grep("\\.frame\\(width: 390\\)", path="{component_file_path}")
+
+# Check for adaptive grid usage (should exist for card lists)
+Grep("LazyVGrid|GridItem|adaptive", path="{component_file_path}")
+```
+
+**Severity Levels:**
+- `UIScreen.main.bounds` usage → **HIGH** (breaks on iPad)
+- Missing maxWidth cap on root → **MEDIUM** (content stretches)
+- Fixed width matching iPhone → **MEDIUM** (layout breaks on larger screens)
+- VStack for 3+ repeating items → **LOW** (functional but suboptimal)
+
+**Report Output:**
+
+```markdown
+### Tablet Layout Verification
+
+| Check | Status | Details |
+|-------|--------|---------|
+| Content width cap | ✅/❌ | maxWidth: {value} on root container |
+| No hardcoded screen widths | ✅/❌ | Found {count} UIScreen references |
+| Adaptive grid for cards | ✅/❌ | {count} card lists using LazyVGrid |
+| Flexible widths | ✅/❌ | {count} fixed widths found |
+```
+
 ## Verification Process
 
 ### Step 1: Load Spec Requirements
