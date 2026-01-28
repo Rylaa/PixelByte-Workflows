@@ -1186,6 +1186,89 @@ export const {ComponentName}: React.FC<{ComponentName}Props> = ({
 - Include focus-visible styles for keyboard users
 - Use semantic HTML elements appropriately
 
+## Responsive Patterns
+
+Map Figma constraints and breakpoints to Tailwind responsive prefixes.
+
+### Figma Constraints → Tailwind
+
+| Figma Constraint | Tailwind Pattern |
+|------------------|------------------|
+| Fill container (width) | `w-full` |
+| Fixed width | `w-[Xpx]` |
+| Hug contents | `w-auto` or `w-fit` |
+| Min/Max width | `min-w-[X] max-w-[Y]` |
+
+### Breakpoint Mapping
+
+**Standard Figma frame sizes:**
+
+| Figma Frame | Tailwind Breakpoint | Use |
+|-------------|---------------------|-----|
+| 375px (Mobile) | Default (no prefix) | Mobile-first base |
+| 768px (Tablet) | `md:` | Tablet layouts |
+| 1024px (Desktop) | `lg:` | Desktop layouts |
+| 1280px (Large) | `xl:` | Wide screens |
+
+**Responsive component example:**
+
+```tsx
+// Card that adapts to screen size
+<article className={cn(
+  // Mobile (default): Full width, vertical
+  "flex flex-col w-full gap-4 p-4",
+  // Tablet: Horizontal layout, max width
+  "md:flex-row md:max-w-[600px] md:p-6",
+  // Desktop: Larger padding
+  "lg:max-w-[800px] lg:p-8"
+)}>
+  <Image
+    src={imageSrc}
+    alt={imageAlt}
+    // Responsive image sizing
+    className="w-full h-48 md:w-1/3 md:h-auto object-cover rounded-lg"
+  />
+  <div className="flex-1">
+    <h2 className="text-lg md:text-xl lg:text-2xl font-bold">{title}</h2>
+    <p className="text-sm md:text-base text-gray-600">{description}</p>
+  </div>
+</article>
+```
+
+### Auto Layout → Flexbox/Grid
+
+| Figma Auto Layout | Tailwind |
+|-------------------|----------|
+| Horizontal | `flex flex-row` |
+| Vertical | `flex flex-col` |
+| Wrap | `flex flex-wrap` |
+| Gap: 16 | `gap-4` |
+| Padding: 24 | `p-6` |
+| Space between | `justify-between` |
+| Align center | `items-center` |
+
+**Grid for complex layouts:**
+```tsx
+// 2-column grid on desktop, single column on mobile
+<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+  {items.map(item => <Card key={item.id} {...item} />)}
+</div>
+```
+
+### Container Pattern
+
+```tsx
+// Responsive container with max-width
+<div className="container mx-auto px-4 md:px-6 lg:px-8">
+  {children}
+</div>
+
+// Or with explicit max-widths
+<div className="w-full max-w-7xl mx-auto px-4">
+  {children}
+</div>
+```
+
 ## Required Utilities
 
 **CRITICAL:** When generating React code, include these helper utilities if needed.
