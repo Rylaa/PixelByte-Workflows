@@ -793,6 +793,23 @@ Image("growth-chart")
 Text("PROJECTED GROWTH")  // ← This would duplicate text in image
 ```
 
+#### Unresolved Icon Handling
+
+When the spec contains an "Unresolved Assets" section with icon entries:
+
+1. Generate a placeholder with `// TODO` marker:
+```swift
+// TODO: Unresolved icon asset (Node ID: 3:400)
+// Visual reference: See figma-reports/{file_key}-spec.md Unresolved Assets section
+Image(systemName: "questionmark.square.dashed")
+    .resizable()
+    .aspectRatio(contentMode: .fit)
+    .frame(width: 32, height: 32)
+```
+
+2. Do NOT use a different icon as fallback — wrong icon is worse than placeholder
+3. The compliance-checker MUST flag this as a FAIL condition
+
 #### 2. Enhance with SwiftUI Specifics
 
 Take the MCP-generated code and enhance it with SwiftUI patterns:
