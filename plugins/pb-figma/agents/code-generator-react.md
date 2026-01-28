@@ -39,12 +39,14 @@ Use `TodoWrite` to track code generation progress through these steps:
 
 1. **Read Implementation Spec** - Load and parse the spec file
 2. **Verify Spec Status** - Check that spec is ready for code generation
-3. **Detect React/Next.js Framework** - Identify React variant and Tailwind
-4. **Confirm Framework with User** - Validate detection with user
-5. **Generate Component Code** - Use MCP to generate base code for each component
-6. **Enhance with React Specifics** - Add TypeScript types, React patterns, accessibility
-7. **Write Component Files** - Save to React project structure
-8. **Update Spec with Results** - Add Generated Code table and next agent input
+3. **Build Asset Node Map** - Extract Asset Children from all components
+4. **Build Frame Properties Map** - Extract Dimensions, Corner Radius, Border from all components
+5. **Detect React/Next.js Framework** - Identify React variant and Tailwind version
+6. **Confirm Framework with User** - Validate detection with user
+7. **Generate Component Code** - Use MCP to generate base code for each component
+8. **Enhance with React Specifics** - Add types, tokens, gradients, accessibility
+9. **Write Component Files** - Save to React project structure
+10. **Update Spec with Results** - Add Generated Code table and next agent input
 
 ## Asset Node Map
 
