@@ -1254,6 +1254,111 @@ Text("Auto-sizing text")
 ❌ Using `.frame(maxHeight:)` for `NONE` mode → Text may overflow
 ✅ Using `.frame(width:height:).clipped()` for `NONE` mode → Clean clipping
 
+#### Adaptive Layout Patterns (iPad/Tablet Support)
+
+**Read from Implementation Spec:**
+
+Check for Auto Layout and responsive properties in component specs:
+
+```markdown
+| Property | Value |
+|----------|-------|
+| **Auto Layout** | `VERTICAL, primaryAxis: MIN, counterAxis: CENTER` |
+| **Constraints** | `horizontal: STRETCH, vertical: MIN` |
+| **Responsive** | `content stretches to fill parent` |
+```
+
+**Rule 1 — Content Width Cap:**
+
+All top-level content containers (the outermost VStack/ScrollView) MUST include a width cap for iPad readability:
+
+```swift
+VStack(spacing: 16) {
+    // content
+}
+.frame(maxWidth: 600) // prevent over-stretching on iPad
+.frame(maxWidth: .infinity) // center within parent
+```
+
+**When to apply:**
+- The root container of ANY generated view
+- Only at the top level (not nested containers)
+
+**Rule 2 — Card Lists with 3+ Items:**
+
+When a VStack contains 3 or more card-like children with identical structure (same component type repeated), use adaptive grid:
+
+```swift
+private let columns = [GridItem(.adaptive(minimum: 280, maximum: 400))]
+
+var body: some View {
+    LazyVGrid(columns: columns, spacing: 16) {
+        ForEach(items) { item in
+            CardView(item: item)
+        }
+    }
+}
+```
+
+**When to apply:**
+- Spec shows a repeating card pattern (ForEach over items)
+- 3+ items with identical structure
+- NOT for 1-2 items (keep VStack)
+
+**Rule 3 — Safe Layout Defaults:**
+
+ALWAYS follow these defaults in generated code:
+
+```swift
+// ✅ DO: Use flexible widths
+.frame(maxWidth: .infinity)
+
+// ❌ DON'T: Use screen-dependent widths
+.frame(width: UIScreen.main.bounds.width)
+.frame(width: 393) // hardcoded iPhone width
+
+// ✅ DO: Use horizontal padding for edge spacing
+.padding(.horizontal, 16)
+
+// ❌ DON'T: Calculate padding from screen width
+.padding(.horizontal, (UIScreen.main.bounds.width - 361) / 2)
+```
+
+**Rule 4 — Size Class (Optional, for complex layouts):**
+
+Only use when the spec explicitly mentions different tablet layout OR the design has major structural differences for wider screens:
+
+```swift
+@Environment(\.horizontalSizeClass) var horizontalSizeClass
+
+var body: some View {
+    if horizontalSizeClass == .regular {
+        // iPad: side-by-side layout
+        HStack(spacing: 24) {
+            leftContent
+            rightContent
+        }
+    } else {
+        // iPhone: stacked layout
+        VStack(spacing: 16) {
+            leftContent
+            rightContent
+        }
+    }
+}
+```
+
+**Common mistakes:**
+
+❌ Hardcoding `UIScreen.main.bounds.width` → Breaks on iPad and landscape
+✅ Using `.frame(maxWidth: .infinity)` → Works on all screen sizes
+
+❌ Missing maxWidth cap on root container → Content stretches too wide on iPad
+✅ `.frame(maxWidth: 600).frame(maxWidth: .infinity)` → Capped and centered
+
+❌ Using VStack for 5+ repeating cards → Wasted horizontal space on iPad
+✅ Using `LazyVGrid(.adaptive(...))` → Auto-adjusts columns by screen width
+
 ##### Use Proper View Structure
 
 Ensure proper SwiftUI View protocol implementation:
