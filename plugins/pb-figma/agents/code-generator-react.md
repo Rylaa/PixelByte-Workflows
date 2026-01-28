@@ -980,6 +980,115 @@ export const {ComponentName}: React.FC<{ComponentName}Props> = ({
 - Include focus-visible styles for keyboard users
 - Use semantic HTML elements appropriately
 
+## Required Utilities
+
+**CRITICAL:** When generating React code, include these helper utilities if needed.
+
+### cn() Utility (Class Name Merger)
+
+If any generated code uses `cn()`, ensure this utility exists:
+
+```tsx
+// lib/utils.ts
+import { type ClassValue, clsx } from 'clsx';
+import { twMerge } from 'tailwind-merge';
+
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs));
+}
+```
+
+**Dependencies required:**
+```bash
+npm install clsx tailwind-merge
+```
+
+**Usage:**
+```tsx
+import { cn } from '@/lib/utils';
+
+<div className={cn(
+  "flex flex-col",           // Base classes
+  isActive && "bg-primary",  // Conditional
+  className                  // Props override
+)}>
+```
+
+### CSS Variables Setup
+
+If spec uses CSS custom properties, ensure they're defined:
+
+```css
+/* styles/globals.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --color-primary: #3B82F6;
+    --color-secondary: #6B7280;
+    --color-background: #FFFFFF;
+    --color-foreground: #1F2937;
+    --color-border: #E5E7EB;
+    /* From Design Tokens section */
+  }
+
+  .dark {
+    --color-primary: #60A5FA;
+    --color-secondary: #9CA3AF;
+    --color-background: #111827;
+    --color-foreground: #F9FAFB;
+    --color-border: #374151;
+  }
+}
+```
+
+**Usage in Tailwind:**
+```tsx
+<div className="bg-[var(--color-background)] text-[var(--color-foreground)]">
+```
+
+### Tailwind 4 Theme Setup (if using Tailwind v4)
+
+```css
+/* styles/globals.css */
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #3B82F6;
+  --color-secondary: #6B7280;
+  --color-accent: #F59E0B;
+  /* Semantic colors from Design Tokens */
+
+  --font-sans: 'Inter', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  --radius-sm: 0.25rem;
+  --radius-md: 0.375rem;
+  --radius-lg: 0.5rem;
+  --radius-xl: 0.75rem;
+}
+```
+
+### When to Include Utilities
+
+| Utility | Include When |
+|---------|--------------|
+| cn() | Any conditional class merging |
+| CSS Variables | Design tokens used with `var(--...)` |
+| Tailwind @theme | Tailwind v4 project with custom tokens |
+
+**Check for existing setup:**
+```bash
+# Check if cn exists
+Grep("export function cn", path="lib/utils.ts")
+Grep("export function cn", path="src/lib/utils.ts")
+
+# Check if CSS variables exist
+Grep("--color-primary", path="styles/globals.css")
+```
+
 ## Output
 
 Update the Implementation Spec at: `docs/figma-reports/{file_key}-spec.md`
