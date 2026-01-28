@@ -352,20 +352,44 @@ Border Radius → Tailwind
 Custom → rounded-[Xpx]
 ```
 
-#### Opacity Handling
+#### Colors with Opacity
 
-See: @skills/figma-to-code/references/opacity-extraction.md
+Read the Colors table from Validation Report including Fill Opacity column.
 
-**Key rule:** Always calculate `effectiveOpacity = fillOpacity * nodeOpacity`
-
-**In Implementation Spec - Always include Opacity column:**
+**Design Tokens Output (Implementation Spec):**
 
 ```markdown
+### Colors
+
 | Property | Color | Opacity | Usage |
 |----------|-------|---------|-------|
-| Border | #ffffff | 0.4 | `.stroke(Color.white.opacity(0.4))` |
-| Background | #150200 | 1.0 | `.background(Color(hex: "#150200"))` |
+| Background | #000000 | 1.0 | `.background(Color(hex: "#000000"))` |
+| Card Background | #f2f20d | 0.05 | `.background(Color(hex: "#f2f20d").opacity(0.05))` |
+| Text Primary | #ffffff | 1.0 | `.foregroundColor(.white)` |
+| Text Secondary | #ffffff | 0.7 | `.foregroundColor(.white.opacity(0.7))` |
+| Border | #414141 | 1.0 | `.stroke(Color(hex: "#414141"))` |
 ```
+
+**Opacity Rules:**
+- **opacity: 1.0** → No `.opacity()` modifier needed
+- **opacity: < 1.0** → Include `.opacity(X)` in Usage column
+- **Always copy effectiveOpacity** from Validation Report to Spec
+
+**SwiftUI Mapping:**
+```swift
+// opacity: 1.0 (no modifier)
+.foregroundColor(.white)
+
+// opacity: 0.7
+.foregroundColor(.white.opacity(0.7))
+
+// opacity: 0.05 on background
+.background(Color(hex: "#f2f20d").opacity(0.05))
+```
+
+**Reference:** @skills/figma-to-code/references/opacity-extraction.md
+
+**Key rule:** Always calculate `effectiveOpacity = fillOpacity * nodeOpacity`
 
 **Warning conditions:**
 - Border/stroke opacity < 0.8 → Add to Design Warnings
