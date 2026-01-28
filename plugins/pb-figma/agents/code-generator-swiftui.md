@@ -202,6 +202,122 @@ If asset was in "Flagged for LLM Review" and decided as DOWNLOAD_AS_IMAGE:
 - Add `.clipped()` to prevent overflow
 - Consider adding `.cornerRadius()` if parent has border radius
 
+### Image-with-Text Detection
+
+**Problem:** Some illustration assets already contain text labels. Adding code-generated text creates duplication.
+
+**Detection from Implementation Spec:**
+
+Check "Flagged for LLM Review" section for flagged frames:
+
+```markdown
+## Flagged for LLM Review
+
+| Node ID | Name | Trigger | Reason |
+|---------|------|---------|--------|
+| 6:32 | PROJECTED GROWTH | Dark+Bright Siblings | ... |
+```
+
+**If a flagged frame:**
+1. Was decided as `DOWNLOAD_AS_IMAGE` by asset-manager
+2. AND has a text-like name (contains capitalized words)
+3. → The image likely contains that text
+
+**Code Generation Rule:**
+
+When generating code for a component that contains a flagged illustration:
+
+```swift
+// ❌ WRONG - Duplicates text that's in the image
+VStack(spacing: 8) {
+    Text("PROJECTED GROWTH")  // This text is already in the image!
+        .font(.caption)
+
+    Image("growth-chart")
+        .resizable()
+        .aspectRatio(contentMode: .fit)
+}
+
+// ✅ CORRECT - Image contains the text, no duplication
+VStack(spacing: 8) {
+    Image("growth-chart")  // Image already has "PROJECTED GROWTH" text
+        .resizable()
+        .aspectRatio(contentMode: .fit)
+        .frame(maxWidth: 354)
+        .accessibilityLabel("Projected Growth chart showing upward trend")
+}
+```
+
+**Detection Algorithm:**
+
+```
+For each flagged illustration asset:
+1. Check if asset name contains text words (PROJECTED GROWTH, TITLE, LABEL)
+2. Check if parent component in spec has a Text child with same content
+3. If match found:
+   a. DO NOT generate Text() for that content
+   b. Add accessibilityLabel to Image() instead
+   c. Document in code comments: "// Text embedded in image"
+```
+
+### Reading Flagged Items for Code Generation
+
+**Step 1: Parse "Flagged for LLM Review" from spec**
+
+```
+For each entry in Flagged for LLM Review table:
+  Read: Node ID, Name, Trigger, Reason
+
+  If LLM Decision is DOWNLOAD_AS_IMAGE:
+    Add to imageWithTextCandidates set
+```
+
+**Step 2: Cross-reference with component children**
+
+```
+For each component being generated:
+  For each Text child in spec:
+    If Text content matches any imageWithTextCandidates name:
+      Mark as SKIP_TEXT_GENERATION
+      Add accessibility label to image instead
+```
+
+**Example Spec Input:**
+
+```markdown
+### GrowthSectionView
+
+| Property | Value |
+|----------|-------|
+| **Children** | TitleText, ChartIllustration |
+| **Asset Children** | `IMAGE:growth-chart:6:32:354:132` |
+
+## Flagged for LLM Review
+
+| Node ID | Name | LLM Decision |
+|---------|------|--------------|
+| 6:32 | PROJECTED GROWTH | DOWNLOAD_AS_IMAGE |
+```
+
+**Generated Code:**
+
+```swift
+struct GrowthSectionView: View {
+    var body: some View {
+        VStack(spacing: 8) {
+            // TitleText SKIPPED - text "PROJECTED GROWTH" embedded in image
+
+            // Asset: growth-chart (flagged illustration with embedded text)
+            Image("growth-chart")
+                .resizable()
+                .aspectRatio(contentMode: .fit)
+                .frame(maxWidth: 354)
+                .accessibilityLabel("Projected Growth chart")
+        }
+    }
+}
+```
+
 ## Frame Properties Map
 
 **CRITICAL:** Extract frame properties from each component to apply correct modifiers.
