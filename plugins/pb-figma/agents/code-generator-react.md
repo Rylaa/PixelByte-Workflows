@@ -673,6 +673,76 @@ Replace hardcoded values with CSS custom properties or Tailwind tokens from the 
 5. **Prefer Tailwind utilities** when gradient is simple (2-3 colors, standard angles)
 6. **Use style prop** for complex gradients (4+ colors, precise positions)
 
+##### Apply Text Decoration from Spec
+
+Read text decoration from the **"Text Decoration"** section of Implementation Spec.
+
+**Input format (Implementation Spec):**
+
+```markdown
+### Text Decoration
+
+**Component:** HookText
+- **Decoration:** Underline | Strikethrough
+- **Color:** #ffd100 (opacity: 1.0)
+- **Thickness:** 1.0
+
+**Tailwind Mapping:** `underline decoration-[#ffd100]`
+```
+
+**Tailwind patterns:**
+
+```tsx
+// Underline with custom color
+<span className="underline decoration-[#ffd100]">
+  Underlined Text
+</span>
+
+// Strikethrough with color
+<span className="line-through decoration-[#ff0000]/80">
+  Strikethrough Text
+</span>
+
+// Combined with other text styles
+<span className="text-lg font-semibold underline decoration-primary decoration-2">
+  Styled Underline
+</span>
+```
+
+**Decoration properties:**
+
+| Property | Tailwind Class | Example |
+|----------|----------------|---------|
+| Underline | `underline` | `underline` |
+| Strikethrough | `line-through` | `line-through` |
+| Color | `decoration-{color}` | `decoration-red-500` |
+| Arbitrary color | `decoration-[#hex]` | `decoration-[#ffd100]` |
+| Thickness | `decoration-{n}` | `decoration-2` |
+| Opacity | `decoration-{color}/{opacity}` | `decoration-red-500/50` |
+
+**CSS fallback for older browsers:**
+
+```tsx
+// Style prop for exact control
+<span
+  style={{
+    textDecoration: 'underline',
+    textDecorationColor: '#ffd100',
+    textDecorationThickness: '2px'
+  }}
+>
+  Underlined
+</span>
+```
+
+**Common mistakes:**
+
+❌ `text-decoration: underline #ffd100` → Invalid shorthand
+✅ `underline decoration-[#ffd100]` → Tailwind pattern
+
+❌ Missing decoration color when spec has it → Wrong color
+✅ Copy exact color from spec → `decoration-[#ffd100]`
+
 ##### Add Semantic HTML
 
 Ensure proper semantic elements per the spec:
