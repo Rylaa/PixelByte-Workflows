@@ -247,6 +247,6 @@ const fontFamily = "font-sans"; // Fallback
 
 Before generating code, load these references as needed:
 
-- **Token conversion issues?** → Read @skills/figma-to-code/references/token-mapping.md
-- **Layout problems?** → Read @skills/figma-to-code/references/common-issues.md
-- **Error during generation?** → Read @skills/figma-to-code/references/error-recovery.md
+- **Token conversion issues?** → Glob `**/references/token-mapping.md` then Read
+- **Layout problems?** → Glob `**/references/common-issues.md` then Read
+- **Error during generation?** → Glob `**/references/error-recovery.md` then Read
