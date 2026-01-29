@@ -280,15 +280,17 @@ When analyzing a flagged frame screenshot, consider:
 
 **Recording Decisions:**
 
-Add to Implementation Spec after analyzing:
+After LLM Vision analysis, add a new section to the Implementation Spec:
 
 ```markdown
-## Flagged Frames - LLM Decisions
+## Flagged Frame Decisions
 
-| Node ID | Name | Decision | Reason |
-|---------|------|----------|--------|
+| Node ID | Node Name | Decision | Reasoning |
+|---------|-----------|----------|-----------|
 | 6:32 | GrowthSection | DOWNLOAD_AS_IMAGE | Decorative chart with shadow+color overlay effects, not real data |
 ```
+
+**IMPORTANT:** This section must be added to the spec so compliance-checker can verify all flagged frames were resolved. Every entry from "Flagged for LLM Review" must have a corresponding entry in "Flagged Frame Decisions".
 
 **Download Strategy Based on Decision:**
 

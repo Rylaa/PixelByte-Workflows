@@ -180,6 +180,26 @@ Grep("import.*from.*assets", path="{component_file_path}")
 Grep("{expected_asset_path}", path="{component_file_path}")
 ```
 
+### 3.1 Flagged Frame Resolution Check
+
+If the spec contains a "Flagged for LLM Review" section, verify that all flagged frames have been resolved:
+
+- [ ] **All resolved** - Every entry in "Flagged for LLM Review" has a corresponding entry in "Flagged Frame Decisions"
+- [ ] **Valid decisions** - Each decision is either `DOWNLOAD_AS_IMAGE` or `GENERATE_AS_CODE`
+- [ ] **DOWNLOAD_AS_IMAGE verified** - Items with this decision have corresponding files in Downloaded Assets section
+- [ ] **GENERATE_AS_CODE verified** - Items with this decision have corresponding components in Generated Code section
+
+**Verification Method:**
+```
+1. Parse "Flagged for LLM Review" table → collect Node IDs
+2. Parse "Flagged Frame Decisions" table → collect Node IDs + Decisions
+3. Compare: every flagged Node ID must appear in decisions
+4. For DOWNLOAD_AS_IMAGE: check Downloaded Assets for matching node_id → file path
+5. For GENERATE_AS_CODE: check Generated Code for matching component
+```
+
+**If "Flagged for LLM Review" section is absent:** Skip this check entirely — no flagged frames exist.
+
 ### 4. Accessibility (REQUIRED for PASS)
 
 **Critical:** Component CANNOT receive PASS status without passing all accessibility checks.

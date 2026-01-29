@@ -885,6 +885,12 @@ Implementation Spec should include the same section after Assets Required:
 
 **Important:** The design-analyst agent is a pass-through for this section. Do not interpret, filter, or modify the flagged frames - asset-manager will handle the final decision.
 
+**Verification:** The table in the Implementation Spec must be identical to the table in the Validation Report. Do NOT:
+- Interpret the flags or add commentary
+- Make DOWNLOAD_AS_IMAGE / GENERATE_AS_CODE decisions
+- Add or remove entries from the table
+- Change the table format or column headers
+
 ### 8. Image-with-Text Suppression (CRITICAL)
 
 > **Reference:** @skills/figma-to-code/references/image-with-text.md — Image-with-text suppression rules, detection workflow, and code-generator signals.

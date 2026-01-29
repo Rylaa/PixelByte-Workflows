@@ -234,12 +234,14 @@ saturation = (max(R,G,B) - min(R,G,B)) / 255
 ```markdown
 ## Flagged for LLM Review
 
-| Node ID | Name | Trigger | Reason |
-|---------|------|---------|--------|
-| 6:32 | GrowthSection | Dark+Bright Siblings | Children 6:34 (dark) and 6:38 (bright) detected |
-| 6:32 | GrowthSection | Multiple Opacity | 5 opacity values: 0.2, 0.4, 0.6, 0.8, 1.0 |
-| 6:32 | GrowthSection | Gradient Overlay | Child 6:44 has transparent gradient |
+| Node ID | Node Name | Trigger | Dimensions | Details |
+|---------|-----------|---------|------------|---------|
+| 6:32 | GrowthSection | Dark+Bright Siblings | 361×180 | Dark layer L=0.15 (6:34), Bright layer L=0.72 (6:38) |
+| 6:32 | GrowthSection | Multiple Opacity | 361×180 | 5 values: 0.2, 0.4, 0.6, 0.8, 1.0 |
+| 6:32 | GrowthSection | Gradient Overlay | 361×180 | Child 6:44 has transparent gradient |
 ```
+
+**IMPORTANT:** Do NOT make decisions about these frames. Only flag them with evidence. The asset-manager agent makes the final DOWNLOAD_AS_IMAGE / GENERATE_AS_CODE decision via LLM Vision analysis.
 
 ### 9. Inline Text Variation Detection
 
