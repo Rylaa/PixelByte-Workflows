@@ -71,23 +71,31 @@
 | Test Generation | @skills/figma-to-code/references/test-generation.md | code-generator-* |
 | Testing Strategy | @skills/figma-to-code/references/testing-strategy.md | code-generator-* |
 
-### CI/CD & Integration
+### CI/CD & Integration (Partially Integrated)
+
+> **Status:** Storybook is referenced by code-generator-react. CI/CD pipeline integration is documented but not yet connected to any agent.
+
 | Topic | Path | Used By |
 |-------|------|---------|
 | Storybook Integration | @skills/figma-to-code/references/storybook-integration.md | code-generator-react |
-| CI/CD Integration | @skills/figma-to-code/references/ci-cd-integration.md | ⚠️ Not integrated (no agent uses this) |
+| CI/CD Integration | @skills/figma-to-code/references/ci-cd-integration.md | Pipeline orchestration (future) |
 
-## Prompt Templates
+### Planned Features
+| Topic | Path | Used By |
+|-------|------|---------|
+| Planned Features | @skills/figma-to-code/references/planned-features.md | Planning reference |
 
-> **Note:** These prompt templates were designed for previous versions and are not currently used by any agent. Kept for reference.
+## Prompt Templates (Deprecated)
+
+> **⚠️ Deprecated:** These prompt templates were used in versions prior to v1.0. Active agents now load references directly. These files are kept for historical reference only and may be removed in a future version.
 
 | Template | Original Purpose | Status |
 |----------|------------------|--------|
-| analyze-design.md | Design analysis prompts | ⚠️ Unused |
-| mapping-planning.md | Mapping & planning prompts | ⚠️ Unused |
-| generate-component.md | Component generation prompts | ⚠️ Unused |
-| validate-refine.md | Validation prompts | ⚠️ Unused |
-| handoff.md | Handoff documentation | ⚠️ Unused |
+| analyze-design.md | Design analysis prompts | ⚠️ Deprecated |
+| mapping-planning.md | Mapping & planning prompts | ⚠️ Deprecated |
+| generate-component.md | Component generation prompts | ⚠️ Deprecated |
+| validate-refine.md | Validation prompts | ⚠️ Deprecated |
+| handoff.md | Handoff documentation | ⚠️ Deprecated |
 
 **Active agents load references directly** — see the "References" section above.
 
