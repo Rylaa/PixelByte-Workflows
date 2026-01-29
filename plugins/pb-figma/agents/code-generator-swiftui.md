@@ -8,6 +8,7 @@ tools:
   - Grep
   - Bash
   - mcp__plugin_pb-figma_pixelbyte-figma-mcp__figma_generate_code
+  - mcp__plugin_pb-figma_pixelbyte-figma-mcp__figma_add_code_connect_map
   - TodoWrite
   - AskUserQuestion
 ---
@@ -31,10 +32,13 @@ Load these references when needed:
 - Layer order & hierarchy: `layer-order-hierarchy.md` → Glob: `**/references/layer-order-hierarchy.md`
 - Accessibility patterns: `accessibility-patterns.md` → Glob: `**/references/accessibility-patterns.md`
 - Responsive patterns: `responsive-patterns.md` → Glob: `**/references/responsive-patterns.md`
-- SwiftUI patterns (Glass, Layer, Adaptive): `swiftui-patterns.md` → Glob: `**/references/swiftui-patterns.md`
+- SwiftUI patterns (Glass, Layer, Adaptive, Selective Padding, Manual Fallback): `swiftui-patterns.md` → Glob: `**/references/swiftui-patterns.md`
+- SwiftUI component example: `swiftui-component-example.md` → Glob: `**/references/swiftui-component-example.md`
+- Inline text variations: `inline-text-variations.md` → Glob: `**/references/inline-text-variations.md`
 - Test generation: `test-generation.md` → Glob: `**/references/test-generation.md`
 - Testing strategy: `testing-strategy.md` → Glob: `**/references/testing-strategy.md`
 - Error recovery: `error-recovery.md` → Glob: `**/references/error-recovery.md`
+- Framework detection: `framework-detection.md` → Glob: `**/references/framework-detection.md`
 
 # SwiftUI Code Generator Agent
 
@@ -109,7 +113,8 @@ Options:
 
 ## Asset Node Map
 
-> **Reference:** @skills/figma-to-code/references/asset-node-mapping.md — Canonical rules for parsing Asset Children entries and building the assetNodeMap used during code generation.
+> **Reference:** `asset-node-mapping.md` — Canonical rules for parsing Asset Children entries and building the assetNodeMap used during code generation.
+> Load via: `Glob("**/references/asset-node-mapping.md")` → `Read()`
 
 **CRITICAL:** Before generating code, build a map of asset nodes that should become Image() calls.
 
@@ -199,7 +204,8 @@ Image("{asset-name}")
 
 ### Illustration vs Icon Detection
 
-> **Reference:** @skills/figma-to-code/references/illustration-detection.md — Heuristics for distinguishing icons from illustrations based on dimensions, flagged frames, and asset type classification.
+> **Reference:** `illustration-detection.md` — Heuristics for distinguishing icons from illustrations based on dimensions, flagged frames, and asset type classification.
+> Load via: `Glob("**/references/illustration-detection.md")` → `Read()`
 
 Determine asset type from dimensions and apply the corresponding template from above:
 
@@ -216,7 +222,8 @@ If asset was in "Flagged for LLM Review" and decided as DOWNLOAD_AS_IMAGE:
 
 ### Image-with-Text Detection
 
-> **Reference:** @skills/figma-to-code/references/image-with-text.md — Detection algorithm and code generation rules for illustration assets that already contain embedded text labels.
+> **Reference:** `image-with-text.md` — Detection algorithm and code generation rules for illustration assets that already contain embedded text labels.
+> Load via: `Glob("**/references/image-with-text.md")` → `Read()`
 
 > **See also:** [Image-with-Text Handling](#image-with-text-handling) (Step 1.5) for processing the `[contains-text]` annotation produced by design-analyst. This section handles heuristic detection from Flagged Frames; the Step 1.5 section handles the explicit annotation during Asset Children replacement.
 
@@ -367,56 +374,10 @@ For each component in "## Components" section:
 
 See `frame-properties.md` reference for full details, corner terminology mapping, hex-alpha parsing, and worked examples.
 
-## Selective Padding (Edge-to-Edge Children)
+### Selective Padding (Edge-to-Edge Children)
 
-When a parent container has padding AND one or more children have `Edge-to-Edge: true` in the spec, do NOT apply padding as a single `.padding()` on the parent VStack/HStack. Instead, apply padding individually to each NON-edge-to-edge child.
-
-**Detection:** Look for `| **Edge-to-Edge** | true` in any child component's property table.
-
-**Pattern — Parent with mixed children:**
-
-```swift
-// ❌ WRONG: Universal padding pushes ALL children inward
-VStack(spacing: 16) {
-    ImageSection()    // Edge-to-Edge: true — should be full width!
-    ContentSection()  // Needs padding
-    ButtonSection()   // Needs padding
-}
-.padding(.horizontal, 16)  // This incorrectly pads ImageSection too
-.padding(.bottom, 16)
-
-// ✅ CORRECT: Selective padding per child
-VStack(spacing: 16) {
-    ImageSection()    // Edge-to-Edge: no padding applied
-
-    ContentSection()
-        .padding(.horizontal, 16)  // Individual padding
-
-    ButtonSection()
-        .padding(.horizontal, 16)  // Individual padding
-}
-.padding(.bottom, 16)  // Bottom padding still on parent (non-horizontal)
-```
-
-**Rules:**
-1. If ANY child has `Edge-to-Edge: true`, convert parent's horizontal padding to per-child padding
-2. Non-horizontal padding (top, bottom) stays on the parent
-3. Edge-to-edge children get NO horizontal padding
-4. All other children get the parent's horizontal padding value individually
-5. If parent has `clipContent: true` in Figma, add `.clipped()` to the parent
-
-**ClipContent Pattern:**
-
-```swift
-// When parent has clipContent: true (from Figma)
-VStack(spacing: 16) {
-    ImageSection()  // Can overflow — parent clips it
-    ContentSection()
-        .padding(.horizontal, 16)
-}
-.clipped()  // Clips any overflow from edge-to-edge children
-.padding(.bottom, 16)
-```
+> Load detailed rules from: `Glob("**/references/swiftui-patterns.md")` → Read the "Selective Padding" section
+> Key rule: When a child frame spans the full width of its parent, apply horizontal padding ONLY to other children, not the edge-to-edge child.
 
 ## Glass Effect (iOS 26+ Liquid Glass)
 
@@ -566,7 +527,8 @@ Color.primary
 
 ##### Apply Opacity from Spec
 
-> **Reference:** @skills/figma-to-code/references/opacity-extraction.md — Opacity calculation details, layer vs fill opacity, and SwiftUI .opacity() modifier rules.
+> **Reference:** `opacity-extraction.md` — Opacity calculation details, layer vs fill opacity, and SwiftUI .opacity() modifier rules.
+> Load via: `Glob("**/references/opacity-extraction.md")` → `Read()`
 
 See reference: `opacity-extraction.md` (Glob: `**/references/opacity-extraction.md`) for calculation details.
 
@@ -588,7 +550,8 @@ See reference: `opacity-extraction.md` (Glob: `**/references/opacity-extraction.
 
 Read gradient from Implementation Spec "Text with Gradient" section and map to SwiftUI gradient types.
 
-> **Reference:** @skills/figma-to-code/references/gradient-handling.md — Gradient types, SwiftUI mapping, angle conversion, precision rules, and code examples.
+> **Reference:** `gradient-handling.md` — Gradient types, SwiftUI mapping, angle conversion, precision rules, and code examples.
+> Load via: `Glob("**/references/gradient-handling.md")` → `Read()`
 
 **Workflow:**
 1. Read gradient type and ALL stops from Implementation Spec (do not truncate -- some have 7+ stops)
@@ -600,7 +563,8 @@ Read gradient from Implementation Spec "Text with Gradient" section and map to S
 
 ##### Apply Text Decoration from Spec
 
-> **Reference:** @skills/figma-to-code/references/text-decoration.md — Underline and strikethrough mapping, iOS version guards, color/opacity rules, and common mistakes.
+> **Reference:** `text-decoration.md` — Underline and strikethrough mapping, iOS version guards, color/opacity rules, and common mistakes.
+> Load via: `Glob("**/references/text-decoration.md")` → `Read()`
 
 Read text decoration from the **"Text Decoration"** section of Implementation Spec and apply `.underline()` or `.strikethrough()` modifiers with color from spec.
 
@@ -703,110 +667,10 @@ struct HookText: View {
 ❌ `.underline(color: Color(hex: "#ffd100").opacity(1.0))` → Unnecessary .opacity()
 ✅ `.underline(color: Color(hex: "#ffd100"))` → No modifier when opacity = 1.0
 
-##### Apply Inline Text Variations from Spec
+### Inline Text Variations (Multi-Color Text)
 
-**Read from Implementation Spec:**
-
-Check for "### Inline Text Variations" section in Components:
-
-```markdown
-### Inline Text Variations
-
-**Component:** TitleText
-**Full Text:** "Let's fix your Hook"
-**Variations:**
-| Range | Text | Color | Weight | Decoration |
-|-------|------|-------|--------|------------|
-| 0-15 | "Let's fix your " | #FFFFFF | 600 | none |
-| 15-19 | "Hook" | #F2F20D | 600 | underline |
-```
-
-**SwiftUI Code Generation:**
-
-When Inline Text Variations exist, generate Text concatenation:
-
-```swift
-// Single-color text (no variations)
-Text("Simple text")
-  .foregroundColor(.white)
-
-// Multi-color text (with variations from spec)
-(
-  Text("Let's fix your ")
-    .font(.system(size: 24, weight: .semibold))
-    .foregroundColor(.white)
-  +
-  Text("Hook")
-    .font(.system(size: 24, weight: .semibold))
-    .foregroundColor(Color(hex: "#F2F20D"))
-    .underline()
-)
-```
-
-**Generation Rules:**
-
-1. **Wrap in parentheses** when using + operator for Text concatenation
-2. **Each Text segment** gets its own modifiers based on variation table
-3. **Font applies to each segment** (cannot be applied to concatenated result)
-4. **Decoration (underline/strikethrough)** applies only to relevant segment
-5. **Color from hex** when variation color differs from primary
-
-**Template:**
-
-```swift
-// For each variation row in table:
-Text("{variation.text}")
-  .font(.system(size: {fontSize}, weight: .{weight}))
-  .foregroundColor({colorModifier})
-  {decorationModifier}
-
-// colorModifier:
-// - #FFFFFF → .white
-// - #000000 → .black
-// - other → Color(hex: "{color}")
-
-// decorationModifier:
-// - underline → .underline()
-// - strikethrough → .strikethrough()
-// - none → (omit)
-```
-
-**Example Output:**
-
-Input spec:
-```markdown
-| Range | Text | Color | Weight | Decoration |
-|-------|------|-------|--------|------------|
-| 0-15 | "Let's fix your " | #FFFFFF | 600 | none |
-| 15-19 | "Hook" | #F2F20D | 600 | underline |
-```
-
-Generated SwiftUI:
-```swift
-private var titleText: some View {
-  (
-    Text("Let's fix your ")
-      .font(.system(size: 24, weight: .semibold))
-      .foregroundColor(.white)
-    +
-    Text("Hook")
-      .font(.system(size: 24, weight: .semibold))
-      .foregroundColor(Color(hex: "#F2F20D"))
-      .underline()
-  )
-}
-```
-
-**Common mistakes:**
-
-❌ Applying font to concatenated result → Compilation error
-✅ Apply font to each Text segment individually
-
-❌ Missing parentheses around concatenation → Modifier scope issues
-✅ Wrap entire concatenation in parentheses
-
-❌ Using + without parentheses as body → Type inference issues
-✅ Wrap in `Group { }` or parentheses when returning from body
+> Load detailed rules from: `Glob("**/references/inline-text-variations.md")` → Read
+> Key: Use Text concatenation with .foregroundStyle() for multi-color text. Check iOS 15+ for basic, iOS 17+ for advanced variations.
 
 ##### Apply Text Sizing from Spec
 
@@ -881,7 +745,8 @@ struct ButtonView: View {
 
 ##### Add Accessibility
 
-> **Reference:** @skills/figma-to-code/references/accessibility-patterns.md — VoiceOver labels, hints, traits, Dynamic Type, and WCAG contrast requirements for SwiftUI components.
+> **Reference:** `accessibility-patterns.md` — VoiceOver labels, hints, traits, Dynamic Type, and WCAG contrast requirements for SwiftUI components.
+> Load via: `Glob("**/references/accessibility-patterns.md")` → `Read()`
 
 Include accessibility modifiers for VoiceOver:
 
@@ -1011,141 +876,10 @@ Sources/
 
 ## SwiftUI Component Structure
 
-### Component Example
+### Complete Component Example
 
-```swift
-import SwiftUI
-
-/// A card component displaying title, description, and optional image
-struct CardView: View {
-  // MARK: - Properties
-
-  /// Card title
-  let title: String
-
-  /// Card description
-  let description: String?
-
-  /// Optional image name from asset catalog
-  let imageName: String?
-
-  /// Card variant style
-  let variant: CardVariant
-
-  // MARK: - Body
-
-  var body: some View {
-    VStack(alignment: .leading, spacing: 16) {
-      if let imageName = imageName {
-        Image(imageName)
-          .resizable()
-          .aspectRatio(contentMode: .fill)
-          .frame(height: 200)
-          .clipped()
-          .cornerRadius(12)
-      }
-
-      VStack(alignment: .leading, spacing: 8) {
-        Text(title)
-          .font(.title2)
-          .fontWeight(.semibold)
-          .foregroundColor(Color("TextPrimary"))
-
-        if let description = description {
-          Text(description)
-            .font(.body)
-            .foregroundColor(Color("TextSecondary"))
-            .lineLimit(3)
-        }
-      }
-    }
-    .padding(24)
-    .background(backgroundColor)
-    .cornerRadius(16)
-    .shadow(color: Color.black.opacity(0.1), radius: 8, x: 0, y: 4)
-    .accessibilityElement(children: .combine)
-    .accessibilityLabel(accessibilityDescription)
-  }
-
-  // MARK: - Computed Properties
-
-  private var backgroundColor: Color {
-    switch variant {
-    case .elevated:
-      return Color("CardBackground")
-    case .outlined:
-      return Color.clear
-    }
-  }
-
-  private var accessibilityDescription: String {
-    var desc = "Card: \(title)"
-    if let description = description {
-      desc += ". \(description)"
-    }
-    return desc
-  }
-}
-
-// MARK: - Supporting Types
-
-enum CardVariant {
-  case elevated
-  case outlined
-}
-
-// MARK: - Preview (iOS 17+)
-
-#Preview("Light Mode") {
-  CardView(
-    title: "Sample Card",
-    description: "This is a sample description for the card component.",
-    imageName: "sample-image",
-    variant: .elevated
-  )
-  .padding()
-}
-
-#Preview("Dark Mode") {
-  CardView(
-    title: "Sample Card",
-    description: "This is a sample description for the card component.",
-    imageName: "sample-image",
-    variant: .elevated
-  )
-  .preferredColorScheme(.dark)
-  .padding()
-}
-
-// MARK: - Preview (iOS 13-16 fallback)
-
-struct CardView_Previews: PreviewProvider {
-  static var previews: some View {
-    Group {
-      CardView(
-        title: "Sample Card",
-        description: "This is a sample description for the card component.",
-        imageName: "sample-image",
-        variant: .elevated
-      )
-      .previewLayout(.sizeThatFits)
-      .padding()
-      .previewDisplayName("Light Mode")
-
-      CardView(
-        title: "Sample Card",
-        description: "This is a sample description for the card component.",
-        imageName: "sample-image",
-        variant: .elevated
-      )
-      .preferredColorScheme(.dark)
-      .previewLayout(.sizeThatFits)
-      .padding()
-      .previewDisplayName("Dark Mode")
-    }
-  }
-}
-```
+> Load canonical SwiftUI component structure from: `Glob("**/references/swiftui-component-example.md")` → Read
+> Follows: MARK sections, DocC docs, @State properties, body with accessibility, computed helpers, #Preview
 
 ## Required Extensions
 
@@ -1207,52 +941,32 @@ For each generated component, verify:
    - Document in Generated Code table with status "WARN - Missing asset"
    - Add to summary: "Asset {name} not found - using SF Symbol fallback"
 
-## Manual Generation Fallback
+### Step 7: Register Code Connect Mapping
 
-When MCP generation is unavailable, generate SwiftUI code from spec:
+After successfully generating each component, register it for future reuse:
 
-### Extract from Spec
+1. Check if the component already has a Code Connect mapping (`code_connect: true` in spec)
+   - If YES: Skip registration
+   - If NO: Register new mapping:
 
-1. **Component properties** from Components section
-2. **Layout information** from Classes/Styles field
-3. **Semantic element** from Element field
-4. **Children** from Children field
-5. **Design tokens** from Design Tokens (Ready to Use) section
-
-### Generate SwiftUI Structure
-
-```swift
-// From spec:
-// Element: Card Container
-// Layout: vertical stack with 16pt spacing
-// Background: white with shadow
-// Corner radius: 12pt
-
-struct {ComponentName}View: View {
-  // Properties from spec
-  let title: String
-  let description: String?
-
-  var body: some View {
-    VStack(alignment: .leading, spacing: 16) {
-      // Children from spec hierarchy
-      Text(title)
-        .font(.title2)
-        .fontWeight(.semibold)
-
-      if let description = description {
-        Text(description)
-          .font(.body)
-          .foregroundColor(.secondary)
-      }
-    }
-    .padding(24)
-    .background(Color.white)
-    .cornerRadius(12)
-    .shadow(radius: 8)
-  }
-}
+```python
+figma_add_code_connect_map(
+  file_key="{file_key}",
+  node_id="{component_node_id}",
+  component_path="{relative_path_to_generated_file}",
+  component_name="{StructName}",
+  props_mapping={"FigmaPropName": "swiftPropertyName"},
+  variants={"variant_name": {"prop": "value"}},
+  example="StructName(prop: .value)"
+)
 ```
+
+> **Why:** Future pipeline runs can detect this mapping and reuse existing SwiftUI views instead of regenerating them.
+
+### Manual Generation Fallback
+
+> Load fallback generation rules from: `Glob("**/references/swiftui-patterns.md")` → Read the "Manual Generation Fallback" section
+> When MCP code generation fails, manually construct the SwiftUI struct from spec properties.
 
 ## SwiftUI Guidelines
 

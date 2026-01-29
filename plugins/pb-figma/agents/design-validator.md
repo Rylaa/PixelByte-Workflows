@@ -131,7 +131,8 @@ Always run this step even if `figma_list_assets` returns results. Never assume a
 
 ### 4. Frame Properties
 
-> **Reference:** @skills/figma-to-code/references/frame-properties.md — Canonical frame property extraction rules including dimensions, corner radii, and stroke formats.
+> **Reference:** `frame-properties.md` — Canonical frame property extraction rules including dimensions, corner radii, and stroke formats.
+> Load via: `Glob("**/references/frame-properties.md")` → `Read()`
 
 **CRITICAL:** Extract frame properties for ALL container nodes (FRAME, COMPONENT, INSTANCE types).
 
@@ -142,11 +143,13 @@ For each container, extract via `figma_get_node_details`:
 
 **Frame Properties Table in Validation Report:**
 
-| Node ID | Node Name | Width | Height | Corner Radius | Border |
-|---------|-----------|-------|--------|---------------|--------|
-| 3:217 | OnboardingCard | 393 | 568 | 24px (uniform) | none |
-| 3:230 | ChecklistItem | 361 | 80 | 12px (uniform) | 1px #FFFFFF40 inside |
-| 3:306 | GrowthSection | 361 | 180 | 16px (TL/TR), 0 (BL/BR) | none |
+> **IMPORTANT:** Include `absoluteBoundingBox.x` and `absoluteBoundingBox.y` for ALL frames in the Frame Properties table. Downstream agents use these coordinates for layer-order z-index calculation without needing to re-query Figma.
+
+| Node ID | Node Name | Width | Height | X | Y | Corner Radius | Border |
+|---------|-----------|-------|--------|---|---|---------------|--------|
+| 3:217 | OnboardingCard | 393 | 568 | 0 | 0 | 24px (uniform) | none |
+| 3:230 | ChecklistItem | 361 | 80 | 16 | 120 | 12px (uniform) | 1px #FFFFFF40 inside |
+| 3:306 | GrowthSection | 361 | 180 | 16 | 388 | 16px (TL/TR), 0 (BL/BR) | none |
 
 **Formats:**
 - Corner radius -- uniform: `16px (uniform)` | per-corner: `16px (TL/TR), 8px (BL/BR)` or `TL:16 TR:16 BL:8 BR:8`
@@ -154,7 +157,8 @@ For each container, extract via `figma_get_node_details`:
 
 ### 5. Fill Opacity Extraction
 
-> **Reference:** @skills/figma-to-code/references/color-extraction.md — Comprehensive color extraction rules including hex conversion, opacity handling, and gradient formats.
+> **Reference:** `color-extraction.md` — Comprehensive color extraction rules including hex conversion, opacity handling, and gradient formats.
+> Load via: `Glob("**/references/color-extraction.md")` → `Read()`
 
 **CRITICAL:** For each fill color, extract BOTH the hex color AND fill opacity separately.
 
@@ -164,7 +168,8 @@ From `figma_get_node_details`, extract per fill:
 - `nodeDetails.opacity` -> node-level opacity (default 1.0)
 - `effectiveOpacity = fillOpacity * nodeOpacity`
 
-> **Reference:** @skills/figma-to-code/references/opacity-extraction.md — Rules for extracting and combining fill-level and node-level opacity into effective opacity values.
+> **Reference:** `opacity-extraction.md` — Rules for extracting and combining fill-level and node-level opacity into effective opacity values.
+> Load via: `Glob("**/references/opacity-extraction.md")` → `Read()`
 
 **Color Table Requirements:**
 - Fill Opacity column is MANDATORY for all colors
@@ -187,7 +192,8 @@ If any data is unclear or missing:
 
 ### 7. Illustrations & Charts
 
-> **Reference:** @skills/figma-to-code/references/illustration-detection.md — Heuristics for distinguishing illustrations from icons based on size, child count, and export settings.
+> **Reference:** `illustration-detection.md` — Heuristics for distinguishing illustrations from icons based on size, child count, and export settings.
+> Load via: `Glob("**/references/illustration-detection.md")` → `Read()`
 
 - [ ] Nodes with `exportSettings` identified
 - [ ] Large vector groups (>50px, >=3 children) marked as illustrations
@@ -282,7 +288,7 @@ if (overrides && overrides.length > 0 && overrides.some(v => v !== 0)) {
     }).join(', ') || 'inherited';
     const decoration = style.textDecoration || 'NONE';
     return `${idx}: fills: ${fills}, decoration: ${decoration}`;
-    // ↑ See @skills/figma-to-code/references/text-decoration.md for decoration value mapping
+    // ↑ See references/text-decoration.md for decoration value mapping (load via Glob)
   });
 
   // Flag for design-analyst
@@ -447,11 +453,32 @@ Write to: `docs/figma-reports/{file_key}-validation.md`
 
 ### Effects
 
-> **Reference:** @skills/figma-to-code/references/shadow-blur-effects.md — Shadow and blur effect extraction rules and output formats.
+> **Reference:** `shadow-blur-effects.md` — Shadow and blur effect extraction rules and output formats.
+> Load via: `Glob("**/references/shadow-blur-effects.md")` → `Read()`
 
 | Name | Type | Properties |
 |------|------|------------|
 | shadow-sm | drop-shadow | 0 1px 2px rgba(0,0,0,0.05) |
+
+### Gradient Details (if detected)
+
+When gradient fills are detected in any node, include detailed gradient information:
+
+| Node ID | Node Name | Gradient Type | Angle/Position | Stop 1 (Color, Position, Opacity) | Stop 2 | Stop 3+ |
+|---------|-----------|---------------|----------------|-----------------------------------|--------|---------|
+
+> This data eliminates the need for downstream agents to re-query `figma_get_node_details` for gradient extraction.
+
+### Text Auto-Resize Properties
+
+For each text node, also capture the `textAutoResize` property:
+
+| Node ID | Node Name | textAutoResize | Width | Height |
+|---------|-----------|----------------|-------|--------|
+
+Values: `NONE` | `WIDTH_AND_HEIGHT` | `HEIGHT`
+
+> This data enables design-analyst to determine text sizing behavior without additional API calls.
 
 ## Assets Inventory
 | Asset | Type | Node ID | Export Format | Position | Icon Type | Has Export Settings |
@@ -498,7 +525,8 @@ Ready for: Design Analyst Agent
 
 ### Fallback Values
 
-> **Reference:** @skills/figma-to-code/references/font-handling.md — Font family mapping, weight resolution, and fallback font stack rules.
+> **Reference:** `font-handling.md` — Font family mapping, weight resolution, and fallback font stack rules.
+> Load via: `Glob("**/references/font-handling.md")` → `Read()`
 
 If design tokens cannot be extracted:
 

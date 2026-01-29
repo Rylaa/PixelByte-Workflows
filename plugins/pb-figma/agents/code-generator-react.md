@@ -8,6 +8,7 @@ tools:
   - Grep
   - Bash
   - mcp__plugin_pb-figma_pixelbyte-figma-mcp__figma_generate_code
+  - mcp__plugin_pb-figma_pixelbyte-figma-mcp__figma_add_code_connect_map
   - TodoWrite
   - AskUserQuestion
 ---
@@ -36,6 +37,7 @@ Load these references when needed:
 - Testing strategy: `testing-strategy.md` → Glob: `**/references/testing-strategy.md`
 - Storybook integration: `storybook-integration.md` → Glob: `**/references/storybook-integration.md`
 - Error recovery: `error-recovery.md` → Glob: `**/references/error-recovery.md`
+- Framework detection: `framework-detection.md` → Glob: `**/references/framework-detection.md`
 
 # React/Next.js Code Generator Agent
 
@@ -66,7 +68,8 @@ Use `TodoWrite` to track code generation progress through these steps:
 
 ## Asset Node Map
 
-> **Reference:** @skills/figma-to-code/references/asset-node-mapping.md — Comprehensive asset-to-code mapping rules for images, icons, and illustrations.
+> **Reference:** `asset-node-mapping.md` — Comprehensive asset-to-code mapping rules for images, icons, and illustrations.
+> Load via: `Glob("**/references/asset-node-mapping.md")` → `Read()`
 
 **CRITICAL:** Before generating code, build a map of asset nodes that should become `<Image>` or `<img>` tags.
 
@@ -83,7 +86,8 @@ For each component in "## Components" section:
 
 **Example assetNodeMap:**
 
-> **Reference:** @skills/figma-to-code/references/illustration-detection.md — Heuristics for distinguishing icons vs illustrations by size, type, and naming patterns.
+> **Reference:** `illustration-detection.md` — Heuristics for distinguishing icons vs illustrations by size, type, and naming patterns.
+> Load via: `Glob("**/references/illustration-detection.md")` → `Read()`
 
 ```json
 {
@@ -395,7 +399,8 @@ Replace hardcoded values with CSS custom properties or Tailwind tokens from the 
 
 **Common opacity conversions:**
 
-> **Reference:** @skills/figma-to-code/references/color-extraction.md — Color format parsing, hex-alpha conversion, and opacity-to-Tailwind mapping rules.
+> **Reference:** `color-extraction.md` — Color format parsing, hex-alpha conversion, and opacity-to-Tailwind mapping rules.
+> Load via: `Glob("**/references/color-extraction.md")` → `Read()`
 
 | Hex Alpha | Decimal | Tailwind |
 |-----------|---------|----------|
@@ -461,7 +466,8 @@ export interface ButtonProps {
 
 ##### Add Accessibility
 
-> **Reference:** @skills/figma-to-code/references/accessibility-patterns.md — ARIA attributes, focus states, alt text, and keyboard navigation patterns.
+> **Reference:** `accessibility-patterns.md` — ARIA attributes, focus states, alt text, and keyboard navigation patterns.
+> Load via: `Glob("**/references/accessibility-patterns.md")` → `Read()`
 
 Include ARIA attributes and focus states:
 
@@ -501,7 +507,8 @@ Include ARIA attributes and focus states:
 
 **lucide-react pattern:**
 
-> **Reference:** @skills/figma-to-code/references/font-handling.md — Font family detection, fallback stacks, and custom font integration patterns.
+> **Reference:** `font-handling.md` — Font family detection, fallback stacks, and custom font integration patterns.
+> Load via: `Glob("**/references/font-handling.md")` → `Read()`
 
 ```tsx
 import { Check, X, ChevronRight, Search } from 'lucide-react';
@@ -740,6 +747,28 @@ For each generated component, verify:
    - Document in Generated Code table with status "WARN - Missing asset"
    - Add to summary: "Asset {name} not found - using placeholder"
 
+### Step 7: Register Code Connect Mapping
+
+After successfully generating each component, register it for future reuse:
+
+1. Check if the component already has a Code Connect mapping (`code_connect: true` in spec)
+   - If YES: Skip registration (mapping already exists)
+   - If NO: Register new mapping:
+
+```python
+figma_add_code_connect_map(
+  file_key="{file_key}",
+  node_id="{component_node_id}",
+  component_path="{relative_path_to_generated_file}",
+  component_name="{ComponentName}",
+  props_mapping={"FigmaPropName": "codePropName"},
+  variants={"variant_name": {"prop": "value"}},
+  example="<ComponentName prop='value'>Content</ComponentName>"
+)
+```
+
+> **Why:** Future pipeline runs on the same or similar Figma file can detect this mapping and skip regeneration, dramatically reducing pipeline time.
+
 ## Manual Generation Fallback
 
 When MCP generation is unavailable, generate React code from spec:
@@ -804,7 +833,8 @@ export const {ComponentName}: React.FC<{ComponentName}Props> = ({
 
 ## Responsive Patterns
 
-> **Reference:** @skills/figma-to-code/references/responsive-patterns.md — Figma constraint-to-Tailwind breakpoint mapping and responsive layout strategies.
+> **Reference:** `responsive-patterns.md` — Figma constraint-to-Tailwind breakpoint mapping and responsive layout strategies.
+> Load via: `Glob("**/references/responsive-patterns.md")` → `Read()`
 
 Map Figma constraints and breakpoints to Tailwind responsive prefixes.
 

@@ -9,6 +9,7 @@ tools:
   - TodoWrite
   - mcp__plugin_pb-figma_pixelbyte-figma-mcp__figma_get_node_details
   - mcp__plugin_pb-figma_pixelbyte-figma-mcp__figma_get_file_structure
+  - mcp__plugin_pb-figma_pixelbyte-figma-mcp__figma_get_code_connect_map
 ---
 
 ## Reference Loading
@@ -29,6 +30,34 @@ Load these references when needed:
 - Image with text: `image-with-text.md` → Glob: `**/references/image-with-text.md`
 - Layer order & hierarchy: `layer-order-hierarchy.md` → Glob: `**/references/layer-order-hierarchy.md`
 - Error recovery: `error-recovery.md` → Glob: `**/references/error-recovery.md`
+
+## Data Source Priority
+
+When extracting design properties, ALWAYS follow this priority order:
+
+1. **Read from Validation Report FIRST** — The following data is pre-extracted:
+   - Frame dimensions (Width, Height) → Frame Properties table
+   - Absolute coordinates (X, Y) → Frame Properties table
+   - Corner radius and borders → Frame Properties table
+   - Auto Layout properties → Auto Layout Properties table
+   - Colors, typography, spacing → Design Tokens section
+   - Asset inventory and icon classification → Assets Inventory
+   - Text decorations and style overrides → Inline Text Variations table
+   - Gradient details → Gradient Details table
+   - Text auto-resize → Text Auto-Resize Properties table
+
+2. **Only call Figma MCP if data is MISSING** from the validation report — Check the report first. If a property is not present, then and only then call `figma_get_node_details`.
+
+3. **Never re-query these properties** (already in validation report):
+   - Frame dimensions and coordinates
+   - Corner radius values
+   - Border/stroke properties
+   - Card icon node IDs and classification
+   - Character style overrides
+   - Text decoration values
+   - Gradient stop data
+
+> **Performance impact:** Following this priority reduces API calls by ~70% and significantly speeds up the pipeline.
 
 # Design Analyst Agent
 
@@ -67,6 +96,7 @@ Use `TodoWrite` to track analysis progress through these steps:
    - If PASS/WARN: Proceed normally with full analysis
    - If FAIL: Log warning, document failures, continue with available data
 3. **Analyze Component Structure** - Break down the node hierarchy into components
+3b. **Check Code Connect Mappings** - Look up existing component-to-code mappings
 4. **Determine Implementation Strategy** - Plan semantic HTML, layout methods, responsive behavior
 5. **Map Design Tokens** - Convert tokens to CSS custom properties and Tailwind classes
 6. **Document Asset Requirements** - List all required assets with optimization notes
@@ -103,6 +133,8 @@ For each component, identify:
 - **Variants**: Different states or variations (hover, active, disabled)
 
 #### Card/List Item Icon Classification
+
+> **Cache-first:** Read icon node IDs and types from the validation report's Assets Inventory. Icons are pre-classified as leading/trailing.
 
 See reference: `asset-classification-guide.md` (Glob: `**/references/asset-classification-guide.md`) for full classification rules.
 
@@ -147,7 +179,8 @@ See reference: `asset-classification-guide.md` (Glob: `**/references/asset-class
 
 #### Asset Children Marking
 
-> **Reference:** @skills/figma-to-code/references/asset-node-mapping.md — Maps Figma node types to asset export formats and code-generation patterns.
+> **Reference:** `asset-node-mapping.md` — Maps Figma node types to asset export formats and code-generation patterns.
+> Load via: `Glob("**/references/asset-node-mapping.md")` → `Read()`
 
 **CRITICAL:** When a component contains children that are in the "Assets Required" table, mark them explicitly in the Component output.
 
@@ -193,7 +226,8 @@ Example:
 
 **2. Size Validation:**
 
-> **Reference:** @skills/figma-to-code/references/illustration-detection.md — Size-based illustration vs. icon classification and decorative element detection heuristics.
+> **Reference:** `illustration-detection.md` — Size-based illustration vs. icon classification and decorative element detection heuristics.
+> Load via: `Glob("**/references/illustration-detection.md")` → `Read()`
 
 ```
 Card icon size limits:
@@ -236,9 +270,12 @@ If no valid icon found at expected position:
 
 ### 1.5 Read Frame Properties from Validation Report
 
-> **Reference:** @skills/figma-to-code/references/frame-properties.md — Detailed frame property extraction, corner radius parsing, and border mapping rules.
+> **Reference:** `frame-properties.md` — Detailed frame property extraction, corner radius parsing, and border mapping rules.
+> Load via: `Glob("**/references/frame-properties.md")` → `Read()`
 
 **CRITICAL:** Copy frame properties from Validation Report to each component.
+
+> **Cache-first:** Read frame dimensions from the validation report's Frame Properties table. Only call `figma_get_node_details` if coordinates are missing from the report.
 
 **Mandatory Fields:**
 - Width (REQUIRED)
@@ -387,6 +424,33 @@ The code generator handles Glass Effect in two patterns:
 | **Asset Children** | `IMAGE:icon-clock:3:230:32:32` |
 ```
 
+### Step 2b: Check Code Connect Mappings
+
+Before creating Implementation Spec component entries, check for existing codebase mappings:
+
+1. Call `figma_get_code_connect_map(file_key="{file_key}")` to retrieve existing component-to-code mappings
+2. For each component in the design:
+   - If a Code Connect mapping exists:
+     - Add `code_connect: true` to the component's spec entry
+     - Include `component_path: "{path from mapping}"`
+     - Include `component_name: "{name from mapping}"`
+     - Include `props_mapping: {figma_prop: code_prop}` for property translation
+   - If no mapping exists:
+     - Add `code_connect: false` to the component's spec entry
+     - Code generator will create new component from scratch
+
+**Example spec entry with Code Connect:**
+```
+### Component: HeroCard
+- **Node ID:** 123:456
+- **code_connect:** true
+- **component_path:** src/components/HeroCard.tsx
+- **component_name:** HeroCard
+- **props_mapping:** { "Title": "title", "Subtitle": "subtitle", "Image": "heroImage" }
+```
+
+> **Impact:** Enables code generators to REUSE existing components instead of regenerating, saving tokens and maintaining codebase consistency.
+
 ### 2. Implementation Strategy
 
 For each component, determine:
@@ -414,7 +478,8 @@ For each component, determine:
 
 #### Responsive Behavior
 
-> **Reference:** @skills/figma-to-code/references/responsive-patterns.md — Responsive constraint mapping, breakpoint strategies, and fill/hug content behavior.
+> **Reference:** `responsive-patterns.md` — Responsive constraint mapping, breakpoint strategies, and fill/hug content behavior.
+> Load via: `Glob("**/references/responsive-patterns.md")` → `Read()`
 
 - **Fixed width**: Element has explicit width constraint
 - **Fill container**: Element stretches to parent (`flex-1`, `w-full`)
@@ -445,7 +510,8 @@ text: #1F2937 → --color-text: #1F2937 → text-[var(--color-text)] or text-gra
 
 #### Typography
 
-> **Reference:** @skills/figma-to-code/references/font-handling.md — Font family resolution, weight mapping, line-height calculation, and platform font stacks.
+> **Reference:** `font-handling.md` — Font family resolution, weight mapping, line-height calculation, and platform font stacks.
+> Load via: `Glob("**/references/font-handling.md")` → `Read()`
 
 ```
 Figma → CSS → Tailwind
@@ -473,7 +539,8 @@ Non-standard → arbitrary value [Xpx]
 
 #### Effects
 
-> **Reference:** @skills/figma-to-code/references/shadow-blur-effects.md — Shadow and blur effect extraction, Tailwind mapping, and SwiftUI shadow modifiers.
+> **Reference:** `shadow-blur-effects.md` — Shadow and blur effect extraction, Tailwind mapping, and SwiftUI shadow modifiers.
+> Load via: `Glob("**/references/shadow-blur-effects.md")` → `Read()`
 
 ```
 Shadow → Tailwind
@@ -494,7 +561,8 @@ Custom → rounded-[Xpx]
 
 #### Colors with Opacity
 
-> **Reference:** @skills/figma-to-code/references/color-extraction.md — Color extraction with opacity, effective opacity calculation, and SwiftUI color mapping.
+> **Reference:** `color-extraction.md` — Color extraction with opacity, effective opacity calculation, and SwiftUI color mapping.
+> Load via: `Glob("**/references/color-extraction.md")` → `Read()`
 
 Read the Colors table from Validation Report including Fill Opacity column.
 
@@ -541,7 +609,8 @@ Read the Colors table from Validation Report including Fill Opacity column.
 
 Extract gradient fills from text nodes via `figma_get_node_details`. Check `fills[].type` for gradient types and extract all gradient stops with exact positions.
 
-> **Reference:** @skills/figma-to-code/references/gradient-handling.md — Gradient types, extraction rules, and platform mapping.
+> **Reference:** `gradient-handling.md` — Gradient types, extraction rules, and platform mapping.
+> Load via: `Glob("**/references/gradient-handling.md")` → `Read()`
 
 **Workflow:**
 1. Use `figma_get_node_details` (NOT `figma_get_design_tokens`) to get the `fills` array
@@ -552,7 +621,8 @@ Extract gradient fills from text nodes via `figma_get_node_details`. Check `fill
 
 #### Text Decoration Detection
 
-> **Reference:** @skills/figma-to-code/references/text-decoration.md — Text decoration extraction, REST API limitations, and SwiftUI mapping rules.
+> **Reference:** `text-decoration.md` — Text decoration extraction, REST API limitations, and SwiftUI mapping rules.
+> Load via: `Glob("**/references/text-decoration.md")` → `Read()`
 
 Extract text decoration (underline, strikethrough) from text nodes via `figma_get_node_details`:
 
@@ -904,7 +974,8 @@ Implementation Spec should include the same section after Assets Required:
 
 ### 8. Image-with-Text Suppression (CRITICAL)
 
-> **Reference:** @skills/figma-to-code/references/image-with-text.md — Image-with-text suppression rules, detection workflow, and code-generator signals.
+> **Reference:** `image-with-text.md` — Image-with-text suppression rules, detection workflow, and code-generator signals.
+> Load via: `Glob("**/references/image-with-text.md")` → `Read()`
 
 **Problem:** When a node is flagged as `DOWNLOAD_AS_IMAGE`, its text children are already "baked into" the exported image. If these text children also appear as separate components in the spec, the code-generator will create duplicate `Text()` elements alongside `Image()`.
 
@@ -1175,7 +1246,8 @@ Input file: `docs/figma-reports/{file_key}-spec.md`
 
 ### HTML Semantics
 
-> **Reference:** @skills/figma-to-code/references/accessibility-patterns.md — ARIA attribute mapping, landmark element selection, and keyboard navigation patterns.
+> **Reference:** `accessibility-patterns.md` — ARIA attribute mapping, landmark element selection, and keyboard navigation patterns.
+> Load via: `Glob("**/references/accessibility-patterns.md")` → `Read()`
 
 - Always prefer semantic HTML elements over generic `<div>`
 - Use landmark elements (`<nav>`, `<main>`, `<header>`, `<footer>`)

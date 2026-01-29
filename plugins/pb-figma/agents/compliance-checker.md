@@ -130,8 +130,10 @@ Verify token usage matches spec:
 - [ ] **Border/stroke** - Border width, color, opacity match spec
 - [ ] **Shadows/Effects** - Shadow and blur effects applied
 
-> **Reference:** @skills/figma-to-code/references/frame-properties.md — Frame dimension, corner radius, and border/stroke validation rules
-> **Reference:** @skills/figma-to-code/references/shadow-blur-effects.md — Shadow and blur effect extraction and compliance criteria
+> **Reference:** `frame-properties.md` — Frame dimension, corner radius, and border/stroke validation rules
+> Load via: `Glob("**/references/frame-properties.md")` → `Read()`
+> **Reference:** `shadow-blur-effects.md` — Shadow and blur effect extraction and compliance criteria
+> Load via: `Glob("**/references/shadow-blur-effects.md")` → `Read()`
 
 **Verification Method (React/Tailwind):**
 ```
@@ -170,7 +172,8 @@ Grep("\\.background\\(", path="{component_file_path}")
 Grep("\\.opacity\\([0-9]", path="{component_file_path}")
 ```
 
-> **Reference:** @skills/figma-to-code/references/color-extraction.md — Color token extraction, hex conversion, and opacity handling rules
+> **Reference:** `color-extraction.md` — Color token extraction, hex conversion, and opacity handling rules
+> Load via: `Glob("**/references/color-extraction.md")` → `Read()`
 
 ### 3. Assets
 
@@ -223,7 +226,8 @@ Verify accessibility requirements:
 - [ ] **Keyboard accessible** - All interactive elements reachable via Tab key
 - [ ] **Color contrast** - Text meets WCAG AA (≥4.5:1 for normal text, ≥3:1 for large text)
 
-> **Reference:** @skills/figma-to-code/references/accessibility-patterns.md — ARIA, focus management, contrast, and semantic HTML compliance patterns
+> **Reference:** `accessibility-patterns.md` — ARIA, focus management, contrast, and semantic HTML compliance patterns
+> Load via: `Glob("**/references/accessibility-patterns.md")` → `Read()`
 
 **Verification Method:**
 ```bash
@@ -336,7 +340,8 @@ Grep("viewport", path="{layout_file_path}")
 - [ ] No content clipping at any breakpoint
 - [ ] Font sizes readable at all breakpoints
 
-> **Reference:** @skills/figma-to-code/references/responsive-patterns.md — Breakpoint definitions, adaptive layout rules, and responsive compliance checks
+> **Reference:** `responsive-patterns.md` — Breakpoint definitions, adaptive layout rules, and responsive compliance checks
+> Load via: `Glob("**/references/responsive-patterns.md")` → `Read()`
 
 **If responsive issues found:** Maximum status = WARN (cannot be PASS)
 
@@ -547,7 +552,7 @@ Write Final Report to: `docs/figma-reports/{file_key}-final.md`
 - [ ] Alt text present (1 missing)
 - [x] ARIA labels present
 - [x] Focus states implemented
-> See also: @skills/figma-to-code/references/accessibility-patterns.md
+> See also: `accessibility-patterns.md` (load via Glob)
 
 ### Code Quality
 - [x] No TypeScript errors
@@ -609,8 +614,10 @@ Compare Figma screenshot with browser screenshot:
 | Glass Effect | Visual match | Glass/translucent elements render with proper material effect |
 | Clip Behavior | Overflow clipped | clipContent containers properly clip overflowing children |
 
-> **Reference:** @skills/figma-to-code/references/frame-properties.md — Frame dimension, corner radius, and border/stroke validation rules
-> **Reference:** @skills/figma-to-code/references/shadow-blur-effects.md — Shadow and blur effect extraction and compliance criteria
+> **Reference:** `frame-properties.md` — Frame dimension, corner radius, and border/stroke validation rules
+> Load via: `Glob("**/references/frame-properties.md")` → `Read()`
+> **Reference:** `shadow-blur-effects.md` — Shadow and blur effect extraction and compliance criteria
+> Load via: `Glob("**/references/shadow-blur-effects.md")` → `Read()`
 
 ### 3. Visual Match Determination
 

@@ -37,10 +37,12 @@ Figma URL
 | 2. design-analyst       | -> Implementation Spec
 +-------------------------+
     |
-    v
-+-------------------------+
-| 3. asset-manager        | -> Updated Spec + Assets
-+-------------------------+
+    +---> [PARALLEL] --------+
+    |                         |
+    v                         v
++-------------------+  +-------------------+
+| 3a. asset-manager |  | 3b. font-manager  |  (background)
++-------------------+  +-------------------+
     |
     v
 +---------------------------------------------+
@@ -69,11 +71,15 @@ Task(subagent_type="pb-figma:design-validator",
 Task(subagent_type="pb-figma:design-analyst",
      prompt="Create Implementation Spec from: docs/figma-reports/{file_key}-validation.md")
 
-# Step 3: Asset Manager
+# Step 3: Asset Manager + Font Manager (PARALLEL)
+# Launch BOTH in a single message with multiple Task calls:
 Task(subagent_type="pb-figma:asset-manager",
      prompt="Download assets from spec: docs/figma-reports/{file_key}-spec.md")
+Task(subagent_type="pb-figma:font-manager",
+     prompt="Detect and setup fonts from spec: docs/figma-reports/{file_key}-spec.md",
+     run_in_background=True)
 
-# Step 4: Code Generator (framework-specific)
+# Step 4: Code Generator (after asset-manager completes; font-manager continues in background)
 Task(subagent_type="pb-figma:code-generator-{framework}",
      prompt="Generate code from spec: docs/figma-reports/{file_key}-spec.md")
 
@@ -142,3 +148,4 @@ NOTE: URL format "456-789" must be used as "456:789"!
 | Error recovery | `error-recovery.md` | `**/references/error-recovery.md` |
 | Figma MCP tools | `figma-mcp-server.md` | `**/references/figma-mcp-server.md` |
 | Code Connect | `code-connect-guide.md` | `**/references/code-connect-guide.md` |
+| Framework detection | `framework-detection.md` | `**/references/framework-detection.md` |

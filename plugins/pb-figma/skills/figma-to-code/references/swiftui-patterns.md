@@ -359,3 +359,105 @@ struct RoundedCorner: Shape {
 | RoundedCorner | Per-corner radius AND iOS 15 target |
 
 **Note:** For iOS 16+, use native `UnevenRoundedRectangle` instead of RoundedCorner.
+
+---
+
+## Selective Padding (Edge-to-Edge Children)
+
+When a parent container has padding AND one or more children have `Edge-to-Edge: true` in the spec, do NOT apply padding as a single `.padding()` on the parent VStack/HStack. Instead, apply padding individually to each NON-edge-to-edge child.
+
+**Detection:** Look for `| **Edge-to-Edge** | true` in any child component's property table.
+
+**Pattern — Parent with mixed children:**
+
+```swift
+// ❌ WRONG: Universal padding pushes ALL children inward
+VStack(spacing: 16) {
+    ImageSection()    // Edge-to-Edge: true — should be full width!
+    ContentSection()  // Needs padding
+    ButtonSection()   // Needs padding
+}
+.padding(.horizontal, 16)  // This incorrectly pads ImageSection too
+.padding(.bottom, 16)
+
+// ✅ CORRECT: Selective padding per child
+VStack(spacing: 16) {
+    ImageSection()    // Edge-to-Edge: no padding applied
+
+    ContentSection()
+        .padding(.horizontal, 16)  // Individual padding
+
+    ButtonSection()
+        .padding(.horizontal, 16)  // Individual padding
+}
+.padding(.bottom, 16)  // Bottom padding still on parent (non-horizontal)
+```
+
+**Rules:**
+1. If ANY child has `Edge-to-Edge: true`, convert parent's horizontal padding to per-child padding
+2. Non-horizontal padding (top, bottom) stays on the parent
+3. Edge-to-edge children get NO horizontal padding
+4. All other children get the parent's horizontal padding value individually
+5. If parent has `clipContent: true` in Figma, add `.clipped()` to the parent
+
+**ClipContent Pattern:**
+
+```swift
+// When parent has clipContent: true (from Figma)
+VStack(spacing: 16) {
+    ImageSection()  // Can overflow — parent clips it
+    ContentSection()
+        .padding(.horizontal, 16)
+}
+.clipped()  // Clips any overflow from edge-to-edge children
+.padding(.bottom, 16)
+```
+
+---
+
+## Manual Generation Fallback
+
+When `figma_generate_code` fails or returns unusable code, fall back to manual struct generation:
+
+### Extract from Spec
+
+1. **Component properties** from Components section
+2. **Layout information** from Classes/Styles field
+3. **Semantic element** from Element field
+4. **Children** from Children field
+5. **Design tokens** from Design Tokens (Ready to Use) section
+
+### Generate SwiftUI Structure
+
+```swift
+// From spec:
+// Element: Card Container
+// Layout: vertical stack with 16pt spacing
+// Background: white with shadow
+// Corner radius: 12pt
+
+struct {ComponentName}View: View {
+  // Properties from spec
+  let title: String
+  let description: String?
+
+  var body: some View {
+    VStack(alignment: .leading, spacing: 16) {
+      // Children from spec hierarchy
+      Text(title)
+        .font(.title2)
+        .fontWeight(.semibold)
+
+      if let description = description {
+        Text(description)
+          .font(.body)
+          .foregroundColor(.secondary)
+      }
+    }
+    .padding(24)
+    .background(Color.white)
+    .cornerRadius(12)
+    .shadow(radius: 8)
+  }
+}
+```

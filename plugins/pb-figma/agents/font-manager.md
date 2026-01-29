@@ -79,7 +79,8 @@ Use `TodoWrite` to track font management progress:
 
 ## Font Detection
 
-> **Reference:** @skills/figma-to-code/references/font-handling.md — Font weight mapping, platform-specific usage, and fallback strategies
+> **Reference:** `font-handling.md` — Font weight mapping, platform-specific usage, and fallback strategies
+> Load via: `Glob("**/references/font-handling.md")` → `Read()`
 
 ### Step 1: Parse Typography from Validation Report
 
@@ -239,7 +240,8 @@ For each font_family in fonts_required:
 
 ### Fallback Font Mapping
 
-> **Reference:** @skills/figma-to-code/references/font-handling.md — Font weight mapping, platform-specific usage, and fallback strategies
+> **Reference:** `font-handling.md` — Font weight mapping, platform-specific usage, and fallback strategies
+> Load via: `Glob("**/references/font-handling.md")` → `Read()`
 
 When a font cannot be found, suggest alternatives:
 

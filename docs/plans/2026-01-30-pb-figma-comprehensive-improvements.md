@@ -1379,6 +1379,334 @@ git commit -m "fix(pb-figma): final validation fixes after comprehensive improve
 
 ---
 
+## FAZ 8: @skills Inline Reference Cleanup ✅
+
+> **Status:** ✅ Completed. 36 inline @skills refs replaced across 7 agent files with Glob-based format.
+> **Context:** 36 inline `@skills/figma-to-code/references/...` references remain in agent bodies despite the "Do NOT use @skills paths" warning in every agent's Reference Loading section.
+
+### Task 24: Replace inline @skills references with Glob-based format
+
+**Files (7 agents, 36 inline references):**
+- `agents/design-analyst.md` — 11 inline refs (lines: 150, 196, 239, 417, 448, 476, 497, 544, 555, 907, 1178)
+- `agents/design-validator.md` — 7 inline refs (lines: 134, 157, 167, 190, 285, 450, 501)
+- `agents/code-generator-swiftui.md` — 7 inline refs (lines: 112, 202, 219, 569, 591, 603, 884)
+- `agents/code-generator-react.md` — 6 inline refs (lines: 69, 86, 398, 464, 504, 807)
+- `agents/compliance-checker.md` — 8 inline refs (lines: 133, 134, 173, 226, 339, 550, 612, 613)
+- `agents/font-manager.md` — 2 inline refs (lines: 82, 242)
+- `agents/asset-manager.md` — 2 inline refs (lines: 173, 470)
+
+**Transform pattern:**
+```
+BEFORE:
+> **Reference:** @skills/figma-to-code/references/{filename}.md — Description text
+
+AFTER:
+> **Reference:** `{filename}.md` — Description text
+> Load via: `Glob("**/references/{filename}.md")` → `Read()`
+```
+
+For comment-style refs:
+```
+BEFORE:
+    // ↑ See @skills/figma-to-code/references/text-decoration.md for decoration value mapping
+
+AFTER:
+    // ↑ See references/text-decoration.md for decoration value mapping (load via Glob)
+```
+
+**Commit:** `fix(agents): replace 36 inline @skills paths with Glob-based references`
+
+---
+
+## FAZ 9: API Call Optimization ✅
+
+> **Status:** ✅ Completed. Validation report enriched with coordinates, textAutoResize, gradient details. Cache-first guidance added to design-analyst and asset-manager.
+> **Context:** Pipeline makes ~37 `figma_get_node_details` calls across agents. Design-validator already fetches most data but outputs summaries. Design-analyst re-queries the same nodes for properties already in the validation report. Target: eliminate 70%+ of redundant analyst calls.
+
+### Task 25: Expand design-validator output with missing properties
+
+**Modify:** `agents/design-validator.md`
+
+**Add to Frame Properties table output (around line 143):**
+- `absoluteBoundingBox.x` and `absoluteBoundingBox.y` columns — enables layer order z-index calculation without re-querying
+- Section instruction: "Include absolute coordinates for ALL frames to enable downstream layer-order calculation"
+
+**Add new "Text Properties" section to validation report output:**
+- `textAutoResize` property for each text node (NONE / WIDTH_AND_HEIGHT / HEIGHT)
+- This eliminates design-analyst's need to query `figma_get_node_details` for text sizing
+
+**Add "Gradient Details" subsection to Design Tokens:**
+- When gradient fills detected, include: gradient type, stop positions, colors, opacity
+- This eliminates design-analyst's separate gradient extraction calls
+
+**Commit:** `feat(design-validator): expand report with coordinates, textAutoResize, gradient details`
+
+### Task 26: Add cache-first guidance to design-analyst
+
+**Modify:** `agents/design-analyst.md`
+
+**Add new section after "Reference Loading" (around line 25):**
+```markdown
+## Data Source Priority
+
+When extracting design properties, ALWAYS follow this order:
+1. **Read from Validation Report FIRST** — Frame Properties table, Auto Layout table, Design Tokens, Assets Inventory contain pre-extracted data
+2. **Only call Figma MCP if data is MISSING** from the validation report
+3. **Never re-query** for: frame dimensions, corner radius, borders, card icon node IDs, character style overrides, text decorations — these are already in the validation report
+
+This reduces API calls by ~70% and speeds up the pipeline.
+```
+
+**Add specific guidance in existing sections:**
+- Frame Properties parsing (line ~239): Add "Read from validation report Frame Properties table. Only call `figma_get_node_details` if height/coordinates are missing."
+- Card icon classification (line ~229): Add "Read from validation report Assets Inventory. Icon node IDs and types are pre-classified."
+- Text decoration (line ~557): Add "Check validation report Inline Text Variations table. Only call MCP if textDecoration property not included."
+
+**Commit:** `perf(design-analyst): add cache-first data source priority to reduce redundant API calls`
+
+### Task 27: Add cache-first guidance to asset-manager
+
+**Modify:** `agents/asset-manager.md`
+
+**Add similar "Data Source Priority" section:**
+- Read node IDs and asset types from spec (which came from validation report)
+- Only call `figma_get_node_details` for nodes not already described in spec
+- Batch `figma_export_assets` calls instead of one-by-one
+
+**Commit:** `perf(asset-manager): add cache-first guidance for API call reduction`
+
+---
+
+## FAZ 10: Pipeline Parallelization (Conservative) ✅
+
+> **Status:** ✅ Completed. SKILL.md updated with parallel fork diagram and run_in_background=True for font-manager.
+> **Context:** Currently all 5 pipeline stages run sequentially. Asset-manager and font-manager are independent after design-analyst completes — they can run in parallel. Conservative approach: only parallelize these two.
+
+### Task 28: Update SKILL.md invocation sequence for parallel execution
+
+**Modify:** `skills/figma-to-code/SKILL.md` (lines 61-83)
+
+**Replace sequential Steps 3-4 with parallel dispatch:**
+```python
+# Steps 1-2: Sequential (unchanged)
+# Step 1: Design Validator
+Task(subagent_type="pb-figma:design-validator",
+     prompt="Validate Figma URL: {url}")
+
+# Step 2: Design Analyst (MANDATORY - creates Implementation Spec)
+Task(subagent_type="pb-figma:design-analyst",
+     prompt="Create Implementation Spec from: docs/figma-reports/{file_key}-validation.md")
+
+# Step 3: Asset Manager + Font Manager (PARALLEL)
+# Launch BOTH in a single message with multiple Task calls:
+Task(subagent_type="pb-figma:asset-manager",
+     prompt="Download assets from spec: docs/figma-reports/{file_key}-spec.md")
+Task(subagent_type="pb-figma:font-manager",
+     prompt="Detect and setup fonts from spec: docs/figma-reports/{file_key}-spec.md",
+     run_in_background=True)
+
+# Step 4: Code Generator (after asset-manager completes; font-manager continues in background)
+Task(subagent_type="pb-figma:code-generator-{framework}",
+     prompt="Generate code from spec: docs/figma-reports/{file_key}-spec.md")
+
+# Step 5: Compliance Checker
+Task(subagent_type="pb-figma:compliance-checker",
+     prompt="Validate implementation against spec: docs/figma-reports/{file_key}-spec.md")
+```
+
+**Update pipeline diagram** to show parallel fork:
+```
+design-analyst
+    |
+    +---> asset-manager ----+
+    |                       |
+    +---> font-manager      |  (background)
+         (parallel)         |
+                            v
+                    code-generator
+                            |
+                            v
+                    compliance-checker
+```
+
+**Commit:** `feat(pipeline): parallelize asset-manager and font-manager after design-analyst`
+
+---
+
+## FAZ 11: Framework Detection Standardization ✅
+
+> **Status:** ✅ Completed. framework-detection.md reference created, docs-index + SKILL.md + 2 code-generator agents updated.
+> **Context:** React and SwiftUI agents use completely different detection logic. No shared structure exists. A common reference ensures consistent detection flow.
+
+### Task 29: Create framework-detection.md reference
+
+**Create:** `skills/figma-to-code/references/framework-detection.md`
+
+**Content structure:**
+```markdown
+# Framework Detection Reference
+
+## Standard Detection Flow
+1. Scan project root for framework indicators
+2. Confirm with user if ambiguous
+3. Map to MCP code generation parameter
+
+## Detection Matrix
+
+| Indicator | Framework | MCP Parameter | Agent |
+|-----------|-----------|---------------|-------|
+| *.xcodeproj, *.xcworkspace, Package.swift | SwiftUI | `swiftui` | code-generator-swiftui |
+| package.json with "react" or "next" | React/Next.js | `react_tailwind` | code-generator-react |
+| package.json with "vue" or "nuxt" | Vue/Nuxt | `vue_tailwind` | code-generator-vue 🚧 |
+| build.gradle.kts with "androidx.compose" | Kotlin Compose | `kotlin` | code-generator-kotlin 🚧 |
+| None detected | React (default) | `react_tailwind` | code-generator-react |
+
+## Variant Detection
+
+### React Variants
+- Next.js: `next.config.*` present OR "next" in package.json
+- Vite: `vite.config.*` present
+- CRA: `react-scripts` in package.json
+
+### SwiftUI Variants
+- Xcode Project: `*.xcodeproj` present
+- Xcode Workspace: `*.xcworkspace` present
+- Swift Package: `Package.swift` without xcodeproj
+
+### Tailwind Detection (for web frameworks)
+- `tailwind.config.*` OR `tailwindcss` in package.json dependencies
+- If missing: warn user, suggest adding Tailwind
+
+## User Confirmation
+When detection is ambiguous (e.g., both React and Vue dependencies):
+- Present detected options via AskUserQuestion
+- Default to the first match in the Detection Matrix
+```
+
+**Update agents to reference this file:**
+- `agents/code-generator-react.md`: Add `framework-detection.md` to Reference Loading section
+- `agents/code-generator-swiftui.md`: Add `framework-detection.md` to Reference Loading section
+- `SKILL.md`: Add to references table
+
+**Update docs-index.md:** Add framework-detection.md entry
+
+**Commit:** `feat(references): add framework-detection.md for standardized detection across agents`
+
+---
+
+## FAZ 12: Code Connect MCP Integration ✅
+
+> **Status:** ✅ Completed. design-analyst gets lookup step, both code-generators get registration step + new MCP tools.
+> **Context:** `figma_get_code_connect_map` and `figma_add_code_connect_map` MCP tools are available but 0% used. These tools map Figma components to existing codebase components — critical for reuse.
+
+### Task 30: Add Code Connect lookup to design-analyst
+
+**Modify:** `agents/design-analyst.md`
+
+**Add new step in component analysis workflow (around line 140):**
+```markdown
+### Step 2b: Check Code Connect Mappings
+
+Before creating Implementation Spec component entries:
+1. Call `figma_get_code_connect_map(file_key)` to get existing component mappings
+2. For each mapped component:
+   - Add `code_connect: true` flag to spec entry
+   - Include `component_path` and `component_name` from mapping
+   - Include `props_mapping` for property translation
+3. Mark unmapped components as `code_connect: false`
+
+This enables code generators to REUSE existing components instead of generating from scratch.
+```
+
+**Commit:** `feat(design-analyst): integrate Code Connect MCP for component reuse detection`
+
+### Task 31: Add Code Connect registration to code generators
+
+**Modify:** `agents/code-generator-react.md` and `agents/code-generator-swiftui.md`
+
+**Add post-generation step:**
+```markdown
+### Step 7: Register Code Connect Mapping
+
+After generating each component:
+1. Check if component already has Code Connect mapping (`code_connect: true` in spec)
+2. If NOT mapped, register new mapping:
+   ```
+   figma_add_code_connect_map(
+     file_key="{file_key}",
+     node_id="{component_node_id}",
+     component_path="{generated_file_path}",
+     component_name="{ComponentName}",
+     props_mapping={figma_prop: code_prop}
+   )
+   ```
+3. This enables future pipeline runs to reuse this component
+```
+
+**Update code-connect-guide.md reference:** Add pipeline integration examples
+
+**Commit:** `feat(code-generators): register Code Connect mappings after component generation`
+
+---
+
+## FAZ 13: Additional SwiftUI Prompt Bloat Reduction ✅
+
+> **Status:** ✅ Completed. 4 sections extracted (287 lines removed), code-generator-swiftui.md: 1348→1061 lines.
+> **Context:** code-generator-swiftui.md is still 1,347 lines (target was ~1,100). Several extractable sections remain.
+
+### Task 32: Extract Selective Padding patterns to reference
+
+**Modify:** `agents/code-generator-swiftui.md` (lines 370-419, ~50 lines)
+**Target:** `skills/figma-to-code/references/swiftui-patterns.md` (append)
+
+Extract the "Selective Padding (Edge-to-Edge Children)" section including:
+- Edge-to-edge detection logic
+- ClipContent pattern
+- WRONG vs CORRECT padding examples
+
+Replace with Glob reference pointer.
+
+### Task 33: Extract Component Example to reference
+
+**Modify:** `agents/code-generator-swiftui.md` (lines 1016-1148, ~133 lines)
+**Create:** `skills/figma-to-code/references/swiftui-component-example.md`
+
+Extract the complete CardView example including:
+- MARK comments structure
+- DocC documentation
+- Property wrappers
+- Accessibility modifiers
+- Computed properties
+- #Preview macro
+
+Replace with Glob reference pointer.
+
+### Task 34: Extract Inline Text Variations to reference
+
+**Modify:** `agents/code-generator-swiftui.md` (lines 706-810, ~105 lines)
+**Create:** `skills/figma-to-code/references/inline-text-variations.md`
+
+Extract:
+- Multi-color text generation with .foregroundStyle()
+- Single vs multi-variation detection
+- iOS version guards for text variations
+- Code examples for both patterns
+
+Replace with Glob reference pointer.
+
+### Task 35: Extract Manual Generation Fallback to reference
+
+**Modify:** `agents/code-generator-swiftui.md` (lines 1210-1255, ~46 lines)
+**Target:** `skills/figma-to-code/references/swiftui-patterns.md` (append)
+
+Extract the manual struct generation fallback pattern.
+
+**Expected reduction:** ~334 lines (from 1,347 to ~1,013)
+
+**Commit:** `refactor(code-generator-swiftui): extract 4 sections to references (~334 lines)`
+
+---
+
 ## Özet
 
 | Faz | Task Sayısı | Tahmini Etki |
@@ -1390,4 +1718,10 @@ git commit -m "fix(pb-figma): final validation fixes after comprehensive improve
 | Faz 5: Cross-Reference Tutarlılığı | 2 task | Tüm referanslar senkronize edilir |
 | Faz 6: Yapılandırılabilirlik | 2 task | Hardcoded değerler konfigüre edilebilir olur |
 | Faz 7: Eksik Aşamalar | 4 task | Gelecek geliştirmeler belgelenir |
-| **TOPLAM** | **23 task** | **Sistem kalitesi kapsamlı şekilde artırılır** |
+| **Faz 8: @skills Cleanup** | **1 task** | **36 inline @skills referansı Glob formatına çevrilir** |
+| **Faz 9: API Optimizasyonu** | **3 task** | **~70% redundant API call azaltma** |
+| **Faz 10: Parallelization** | **1 task** | **asset-manager + font-manager paralel çalışır** |
+| **Faz 11: Framework Detection** | **1 task** | **Standardize detection across agents** |
+| **Faz 12: Code Connect MCP** | **2 task** | **Component reuse via MCP integration** |
+| **Faz 13: SwiftUI Bloat** | **4 task** | **~334 satır daha extract edilir** |
+| **TOPLAM** | **35 task** | **Pipeline token-efficient, parallel, reuse-capable** |

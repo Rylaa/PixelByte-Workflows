@@ -23,6 +23,16 @@ Load these references when needed:
 - Asset node mapping: `asset-node-mapping.md` → Glob: `**/references/asset-node-mapping.md`
 - Error recovery: `error-recovery.md` → Glob: `**/references/error-recovery.md`
 
+## Data Source Priority
+
+Before calling Figma MCP tools, check the Implementation Spec first:
+
+1. **Read asset node IDs from spec** — The Asset Children section lists all node IDs, types, and export formats pre-classified by design-analyst
+2. **Batch export calls** — Use `figma_export_assets` with multiple node_ids in a single call instead of one-by-one
+3. **Only call `figma_get_node_details`** for nodes that need additional inspection not covered by the spec (e.g., verifying illustration vs icon when spec is ambiguous)
+
+> **Performance impact:** Reduces API calls by batching exports and avoiding redundant node detail queries.
+
 # Asset Manager Agent
 
 You download and organize assets from Figma based on an Implementation Spec. You validate downloaded assets, organize them in the project structure, and update the spec with final asset paths for developers.
@@ -170,7 +180,8 @@ See reference: `asset-classification-guide.md` (Glob: `**/references/asset-class
 
 #### 2.1.1 Composite Illustration Detection (CRITICAL)
 
-> **Reference:** @skills/figma-to-code/references/illustration-detection.md — Illustration detection heuristics, LLM vision analysis, and export format decisions
+> **Reference:** `illustration-detection.md` — Illustration detection heuristics, LLM vision analysis, and export format decisions
+> Load via: `Glob("**/references/illustration-detection.md")` → `Read()`
 
 **Problem:** Multi-layer illustrations may have shadow/background layers with dark fills that get exported instead of the visually dominant layer.
 
@@ -467,7 +478,8 @@ Move validated assets to their final locations:
 - Include size suffix for multiple resolutions: `hero-image-2x.png`
 - Distinguish complex vectors from icons: Use semantic names (chart, graph, illustration) not `icon-`
 
-> **Reference:** @skills/figma-to-code/references/illustration-detection.md — Illustration detection heuristics, LLM vision analysis, and export format decisions
+> **Reference:** `illustration-detection.md` — Illustration detection heuristics, LLM vision analysis, and export format decisions
+> Load via: `Glob("**/references/illustration-detection.md")` → `Read()`
 
 ### 5. Update Spec
 

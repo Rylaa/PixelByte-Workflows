@@ -33,6 +33,7 @@
 | Error Recovery | @skills/figma-to-code/references/error-recovery.md | all agents |
 | Pipeline Handoff | @skills/figma-to-code/references/pipeline-handoff.md | all agents |
 | Pipeline Config | @skills/figma-to-code/references/pipeline-config.md | all agents |
+| Framework Detection | @skills/figma-to-code/references/framework-detection.md | code-generator-react, code-generator-swiftui, SKILL.md |
 
 ### Validation References
 | Topic | Path | Used By |
@@ -61,6 +62,8 @@
 | Responsive Patterns | @skills/figma-to-code/references/responsive-patterns.md | code-generator-*, compliance-checker |
 | React Patterns (CVA, Utilities) | @skills/figma-to-code/references/react-patterns.md | code-generator-react |
 | SwiftUI Patterns (Glass, Layer, Adaptive) | @skills/figma-to-code/references/swiftui-patterns.md | code-generator-swiftui |
+| SwiftUI Component Example | @skills/figma-to-code/references/swiftui-component-example.md | code-generator-swiftui |
+| Inline Text Variations | @skills/figma-to-code/references/inline-text-variations.md | code-generator-swiftui |
 
 ### Development References
 | Topic | Path | Used By |
