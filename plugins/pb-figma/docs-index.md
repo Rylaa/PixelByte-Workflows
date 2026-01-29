@@ -42,6 +42,23 @@
 | Accessibility Validation | @skills/figma-to-code/references/accessibility-validation.md | compliance-checker |
 | QA Report Template | @skills/figma-to-code/references/qa-report-template.md | compliance-checker |
 
+### Design Knowledge References
+| Topic | Path | Used By |
+|-------|------|---------|
+| Gradient Handling | @skills/figma-to-code/references/gradient-handling.md | design-analyst, design-validator, code-generator-*, compliance-checker |
+| Color Extraction | @skills/figma-to-code/references/color-extraction.md | design-analyst, design-validator, code-generator-*, compliance-checker |
+| Opacity Extraction | @skills/figma-to-code/references/opacity-extraction.md | design-analyst, design-validator, code-generator-*, compliance-checker |
+| Font Handling | @skills/figma-to-code/references/font-handling.md | design-analyst, code-generator-*, font-manager |
+| Frame Properties | @skills/figma-to-code/references/frame-properties.md | design-analyst, design-validator, code-generator-*, compliance-checker |
+| Text Decoration | @skills/figma-to-code/references/text-decoration.md | design-analyst, code-generator-* |
+| Shadow & Blur Effects | @skills/figma-to-code/references/shadow-blur-effects.md | design-analyst, design-validator, code-generator-*, compliance-checker |
+| Asset Node Mapping | @skills/figma-to-code/references/asset-node-mapping.md | design-analyst, code-generator-*, asset-manager |
+| Illustration Detection | @skills/figma-to-code/references/illustration-detection.md | design-analyst, design-validator, code-generator-* |
+| Image with Text | @skills/figma-to-code/references/image-with-text.md | design-analyst, design-validator |
+| Layer Order & Hierarchy | @skills/figma-to-code/references/layer-order-hierarchy.md | design-analyst, code-generator-* |
+| Accessibility Patterns | @skills/figma-to-code/references/accessibility-patterns.md | code-generator-*, compliance-checker |
+| Responsive Patterns | @skills/figma-to-code/references/responsive-patterns.md | code-generator-*, compliance-checker |
+
 ### Development References
 | Topic | Path | Used By |
 |-------|------|---------|
