@@ -1,7 +1,6 @@
 # pb-figma Documentation Index
 
-> **Usage:** Bu dosya tüm pb-figma dokümantasyonunun haritasıdır.
-> Agent'lar sadece ihtiyaç duydukları referansları @path ile yükler.
+> **Usage:** This file is the documentation map for the entire pb-figma plugin. Agents load only the references they need via @path.
 
 ## Quick Start
 
@@ -12,17 +11,17 @@
 
 | Agent | Path | Purpose | Status |
 |-------|------|---------|--------|
-| design-validator | @agents/design-validator.md | Tasarım bütünlüğünü doğrula | ✅ Active |
-| design-analyst | @agents/design-analyst.md | Implementation spec oluştur | ✅ Active |
-| asset-manager | @agents/asset-manager.md | Asset'leri indir ve organize et | ✅ Active |
-| code-generator-react | @agents/code-generator-react.md | React/Tailwind kodu üret | ✅ Active |
-| code-generator-swiftui | @agents/code-generator-swiftui.md | SwiftUI kodu üret | ✅ Active |
-| code-generator-vue | @agents/code-generator-vue.md | Vue 3 kodu üret | 🚧 Placeholder |
-| code-generator-kotlin | @agents/code-generator-kotlin.md | Kotlin Compose kodu üret | 🚧 Placeholder |
-| compliance-checker | @agents/compliance-checker.md | Spec'e uyumu doğrula | ✅ Active |
-| font-manager | @agents/font-manager.md | Font'ları indir ve kur | ✅ Active |
+| design-validator | @agents/design-validator.md | Validate design completeness | ✅ Active |
+| design-analyst | @agents/design-analyst.md | Create Implementation Spec | ✅ Active |
+| asset-manager | @agents/asset-manager.md | Download and organize assets | ✅ Active |
+| code-generator-react | @agents/code-generator-react.md | Generate React/Tailwind code | ✅ Active |
+| code-generator-swiftui | @agents/code-generator-swiftui.md | Generate SwiftUI code | ✅ Active |
+| code-generator-vue | @agents/code-generator-vue.md | Generate Vue 3 code | 🚧 Placeholder |
+| code-generator-kotlin | @agents/code-generator-kotlin.md | Generate Kotlin Compose code | 🚧 Placeholder |
+| compliance-checker | @agents/compliance-checker.md | Validate spec compliance | ✅ Active |
+| font-manager | @agents/font-manager.md | Download and configure fonts | ✅ Active |
 
-> **Note:** Vue ve Kotlin generator'ları gelecek sürümler için planlanmıştır. Şu an için React veya SwiftUI generator'larını kullanın.
+> **Note:** Vue and Kotlin generators are planned for future releases. Use React or SwiftUI generators for now.
 
 ## References (Lazy Load)
 
@@ -76,7 +75,7 @@
 
 ## Prompt Templates
 
-> **Note:** Bu prompt template'leri önceki versiyonlar için tasarlandı, ancak şu an hiçbir agent tarafından kullanılmıyor. Referans için korunuyor.
+> **Note:** These prompt templates were designed for previous versions and are not currently used by any agent. Kept for reference.
 
 | Template | Original Purpose | Status |
 |----------|------------------|--------|
@@ -86,7 +85,7 @@
 | validate-refine.md | Validation prompts | ⚠️ Unused |
 | handoff.md | Handoff documentation | ⚠️ Unused |
 
-**Aktif agent'lar referansları doğrudan yükler** - aşağıdaki "References" bölümüne bakın.
+**Active agents load references directly** — see the "References" section above.
 
 ## Examples & Templates
 
