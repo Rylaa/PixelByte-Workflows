@@ -1,5 +1,7 @@
 # Asset Classification Guide
 
+> **Used by:** asset-manager
+
 ## Asset Type Classification
 
 | Type | Criteria | Download Format |

@@ -17,6 +17,17 @@ tools:
 
 Load these references when needed:
 - Code Connect guide: `code-connect-guide.md` → Glob: `**/references/code-connect-guide.md`
+- Gradient handling: `gradient-handling.md` → Glob: `**/references/gradient-handling.md`
+- Color extraction: `color-extraction.md` → Glob: `**/references/color-extraction.md`
+- Opacity extraction: `opacity-extraction.md` → Glob: `**/references/opacity-extraction.md`
+- Font handling: `font-handling.md` → Glob: `**/references/font-handling.md`
+- Frame properties: `frame-properties.md` → Glob: `**/references/frame-properties.md`
+- Text decoration: `text-decoration.md` → Glob: `**/references/text-decoration.md`
+- Shadow & blur effects: `shadow-blur-effects.md` → Glob: `**/references/shadow-blur-effects.md`
+- Asset node mapping: `asset-node-mapping.md` → Glob: `**/references/asset-node-mapping.md`
+- Illustration detection: `illustration-detection.md` → Glob: `**/references/illustration-detection.md`
+- Image with text: `image-with-text.md` → Glob: `**/references/image-with-text.md`
+- Layer order & hierarchy: `layer-order-hierarchy.md` → Glob: `**/references/layer-order-hierarchy.md`
 - Error recovery: `error-recovery.md` → Glob: `**/references/error-recovery.md`
 
 # Design Analyst Agent

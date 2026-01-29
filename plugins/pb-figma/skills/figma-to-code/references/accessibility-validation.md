@@ -1,5 +1,7 @@
 # Accessibility Validation Reference
 
+> **Used by:** compliance-checker
+
 Bu dokuman, Phase 4'te accessibility (a11y) kontrollerini otomatiklestirmek icin kullanilir.
 
 ---

@@ -1,5 +1,7 @@
 # Visual Validation Loop - Claude Vision Approach
 
+> **Used by:** compliance-checker
+
 This document explains the **Claude Vision-based simple approach** for Phase 4: Visual Validation.
 
 ## Core Principle

@@ -20,6 +20,7 @@ tools:
 Load these references when needed:
 - Asset classification: `asset-classification-guide.md` → Glob: `**/references/asset-classification-guide.md`
 - Illustration detection: `illustration-detection.md` → Glob: `**/references/illustration-detection.md`
+- Asset node mapping: `asset-node-mapping.md` → Glob: `**/references/asset-node-mapping.md`
 - Error recovery: `error-recovery.md` → Glob: `**/references/error-recovery.md`
 
 # Asset Manager Agent

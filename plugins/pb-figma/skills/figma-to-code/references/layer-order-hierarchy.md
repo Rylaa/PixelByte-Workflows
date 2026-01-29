@@ -1,5 +1,7 @@
 # Layer Order & Hierarchy Reference
 
+> **Used by:** design-analyst, code-generator-*
+
 ## Core Principle
 
 **Layer order = children array order, NOT Y coordinate.**

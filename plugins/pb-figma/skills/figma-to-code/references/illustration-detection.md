@@ -1,5 +1,7 @@
 # Illustration Detection Reference
 
+> **Used by:** design-analyst, design-validator, code-generator-*
+
 ## Overview
 
 This reference covers how to detect, classify, and handle illustrations and complex graphics extracted from Figma designs. Illustrations differ from icons in size, complexity, and export strategy.

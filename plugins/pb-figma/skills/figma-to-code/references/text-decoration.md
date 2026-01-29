@@ -1,5 +1,7 @@
 # Text Decoration Reference
 
+> **Used by:** design-analyst, code-generator-*
+
 Guide for extracting text decoration properties from Figma TEXT nodes and mapping them to CSS/Tailwind and SwiftUI code.
 
 ---

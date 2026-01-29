@@ -1,5 +1,7 @@
 # Color Extraction Reference
 
+> **Used by:** design-analyst, design-validator, code-generator-*, compliance-checker
+
 ## Figma Color Format
 
 Figma represents colors as normalized RGBA values in the range `0.0` to `1.0`:

@@ -1,5 +1,7 @@
 # Asset Node Mapping Reference
 
+> **Used by:** design-analyst, code-generator-*, asset-manager
+
 Cross-platform guide for constructing asset node maps from the design-analyst implementation spec and rendering images correctly per platform.
 
 ---

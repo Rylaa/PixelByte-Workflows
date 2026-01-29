@@ -20,8 +20,20 @@ Load these references when needed:
 - Token mapping: `token-mapping.md` → Glob: `**/references/token-mapping.md`
 - Common issues: `common-issues.md` → Glob: `**/references/common-issues.md`
 - Frame properties: `frame-properties.md` → Glob: `**/references/frame-properties.md`
+- Text decoration: `text-decoration.md` → Glob: `**/references/text-decoration.md`
+- Gradient handling: `gradient-handling.md` → Glob: `**/references/gradient-handling.md`
+- Color extraction: `color-extraction.md` → Glob: `**/references/color-extraction.md`
+- Opacity extraction: `opacity-extraction.md` → Glob: `**/references/opacity-extraction.md`
+- Font handling: `font-handling.md` → Glob: `**/references/font-handling.md`
+- Shadow & blur effects: `shadow-blur-effects.md` → Glob: `**/references/shadow-blur-effects.md`
+- Asset node mapping: `asset-node-mapping.md` → Glob: `**/references/asset-node-mapping.md`
+- Illustration detection: `illustration-detection.md` → Glob: `**/references/illustration-detection.md`
+- Layer order & hierarchy: `layer-order-hierarchy.md` → Glob: `**/references/layer-order-hierarchy.md`
+- Accessibility patterns: `accessibility-patterns.md` → Glob: `**/references/accessibility-patterns.md`
+- Responsive patterns: `responsive-patterns.md` → Glob: `**/references/responsive-patterns.md`
 - SwiftUI patterns (Glass, Layer, Adaptive): `swiftui-patterns.md` → Glob: `**/references/swiftui-patterns.md`
 - Test generation: `test-generation.md` → Glob: `**/references/test-generation.md`
+- Testing strategy: `testing-strategy.md` → Glob: `**/references/testing-strategy.md`
 - Error recovery: `error-recovery.md` → Glob: `**/references/error-recovery.md`
 
 # SwiftUI Code Generator Agent

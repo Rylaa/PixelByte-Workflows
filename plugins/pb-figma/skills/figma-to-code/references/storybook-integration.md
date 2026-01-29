@@ -1,5 +1,7 @@
 # Storybook Entegrasyonu
 
+> **Used by:** code-generator-react
+
 Figma-to-code dönüşümünde Storybook, hem dokümantasyon hem de görsel test için kritik öneme sahiptir.
 
 ## Story Template

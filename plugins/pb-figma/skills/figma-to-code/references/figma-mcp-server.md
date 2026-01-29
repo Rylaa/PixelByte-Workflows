@@ -1,5 +1,7 @@
 # Pixelbyte Figma MCP Server Reference
 
+> **Used by:** all agents
+
 Pixelbyte Figma MCP Server is an MCP server that integrates with the Figma API.
 
 ## Server Configuration

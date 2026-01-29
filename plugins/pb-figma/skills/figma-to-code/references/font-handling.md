@@ -1,5 +1,7 @@
 # Font Handling Reference
 
+> **Used by:** design-analyst, code-generator-*, font-manager
+
 ## Font Detection from Figma
 
 Typography tokens are extracted from Figma via `figma_get_design_tokens`:

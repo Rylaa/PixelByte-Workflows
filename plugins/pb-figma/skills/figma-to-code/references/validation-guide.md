@@ -1,5 +1,7 @@
 # Validation Guide
 
+> **Used by:** design-validator
+
 Claude Vision-based strategy for verifying that generated code matches the Figma design.
 
 ## Goal

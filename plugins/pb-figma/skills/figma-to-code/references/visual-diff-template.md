@@ -1,5 +1,7 @@
 # Visual Diff Report Template
 
+> **Used by:** compliance-checker
+
 > Reference document for compliance-checker agent. Defines the output format for visual diff reports.
 
 ## Report Format

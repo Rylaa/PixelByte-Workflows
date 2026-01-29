@@ -1,5 +1,7 @@
 # Common Issues and Solutions
 
+> **Used by:** code-generator-*
+
 Common problems and solutions encountered in Figma-to-code conversion.
 
 ## Typography Issues

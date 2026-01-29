@@ -1,5 +1,7 @@
 # Gradient Handling Reference
 
+> **Used by:** design-analyst, design-validator, code-generator-*, compliance-checker
+
 > Shared gradient domain knowledge for the Figma-to-code pipeline.
 > Referenced by: design-analyst, code-generator-react, code-generator-swiftui
 

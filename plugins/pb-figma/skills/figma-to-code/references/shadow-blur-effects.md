@@ -1,5 +1,7 @@
 # Shadow and Blur Effects Reference
 
+> **Used by:** design-analyst, design-validator, code-generator-*, compliance-checker
+
 Comprehensive reference for shadow, blur, and glass effects across Figma-to-code generation pipelines.
 
 ## Figma Effect Types

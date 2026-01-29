@@ -1,5 +1,7 @@
 # Preview Route Setup Guide
 
+> **Used by:** compliance-checker
+
 To run the visual validation script, you need to create a preview route in your project.
 
 ## Next.js App Router

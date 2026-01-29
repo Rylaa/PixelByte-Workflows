@@ -1,5 +1,7 @@
 # Accessibility Patterns Reference (Code Generation)
 
+> **Used by:** code-generator-*, compliance-checker
+
 Patterns and rules for generating accessible code from Figma designs. This reference covers **what to generate** -- the accessibility modifiers, attributes, and semantic structures that code generators must produce.
 
 > **Cross-reference:** See `@references/accessibility-validation.md` for the compliance-checker validation checklists (how to verify accessibility after generation).

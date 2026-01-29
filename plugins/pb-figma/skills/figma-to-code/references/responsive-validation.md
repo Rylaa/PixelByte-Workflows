@@ -1,5 +1,7 @@
 # Responsive Validation Checklist
 
+> **Used by:** compliance-checker
+
 This document provides a systematic approach to multi-breakpoint validation for Phase 4: Visual Validation.
 
 ---

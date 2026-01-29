@@ -22,8 +22,18 @@ Load these references when needed:
 - Frame properties: `frame-properties.md` → Glob: `**/references/frame-properties.md`
 - Text decoration: `text-decoration.md` → Glob: `**/references/text-decoration.md`
 - Gradient handling: `gradient-handling.md` → Glob: `**/references/gradient-handling.md`
+- Color extraction: `color-extraction.md` → Glob: `**/references/color-extraction.md`
+- Opacity extraction: `opacity-extraction.md` → Glob: `**/references/opacity-extraction.md`
+- Font handling: `font-handling.md` → Glob: `**/references/font-handling.md`
+- Shadow & blur effects: `shadow-blur-effects.md` → Glob: `**/references/shadow-blur-effects.md`
+- Asset node mapping: `asset-node-mapping.md` → Glob: `**/references/asset-node-mapping.md`
+- Illustration detection: `illustration-detection.md` → Glob: `**/references/illustration-detection.md`
+- Layer order & hierarchy: `layer-order-hierarchy.md` → Glob: `**/references/layer-order-hierarchy.md`
+- Accessibility patterns: `accessibility-patterns.md` → Glob: `**/references/accessibility-patterns.md`
+- Responsive patterns: `responsive-patterns.md` → Glob: `**/references/responsive-patterns.md`
 - React patterns (CVA, utilities): `react-patterns.md` → Glob: `**/references/react-patterns.md`
 - Test generation: `test-generation.md` → Glob: `**/references/test-generation.md`
+- Testing strategy: `testing-strategy.md` → Glob: `**/references/testing-strategy.md`
 - Storybook integration: `storybook-integration.md` → Glob: `**/references/storybook-integration.md`
 - Error recovery: `error-recovery.md` → Glob: `**/references/error-recovery.md`
 

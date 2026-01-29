@@ -1,5 +1,7 @@
 # Design Token Mapping Reference
 
+> **Used by:** code-generator-*
+
 Figma'dan Tailwind/CSS'e dönüşüm için kapsamlı formüller ve örnekler.
 
 ## Tipografi Dönüşümü

@@ -1,5 +1,7 @@
 # QA Report Template (Claude Vision)
 
+> **Used by:** compliance-checker
+
 Bu şablon, Phase 4 Visual Validation sonrasında `.qa/report.md` dosyası için kullanılır.
 
 > **Not:** Bu template Claude Vision yaklaşımını kullanır. RMSE/ImageMagick metodolojisi kullanılmaz.

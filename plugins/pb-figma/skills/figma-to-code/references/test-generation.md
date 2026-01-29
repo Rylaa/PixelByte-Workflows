@@ -1,5 +1,7 @@
 # Test Generation Reference
 
+> **Used by:** code-generator-*
+
 Bu dokuman, Figma-to-code donusumunde Phase 5 Handoff asamasinda otomatik test uretimi icin kullanilir.
 
 ---

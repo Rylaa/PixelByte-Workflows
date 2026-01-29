@@ -1,5 +1,7 @@
 # Frame Properties Reference
 
+> **Used by:** design-analyst, design-validator, code-generator-*, compliance-checker
+
 Comprehensive guide for extracting Figma frame properties (dimensions, corner radius, borders) and mapping them to CSS/Tailwind and SwiftUI code.
 
 ---

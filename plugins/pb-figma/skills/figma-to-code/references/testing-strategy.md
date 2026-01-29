@@ -1,5 +1,7 @@
 # Test Stratejisi ve Template'ler
 
+> **Used by:** code-generator-*
+
 Figma-to-code dönüşümünde üretilen bileşenlerin test coverage'ı enterprise kalite için kritiktir.
 
 ## Test Piramidi

@@ -1,5 +1,7 @@
 # CI/CD Entegrasyonu
 
+> **Used by:** ⚠️ Not currently integrated (no agent references this)
+
 Bu rehber, Figma-to-code skill'inin CI/CD pipeline'ına entegrasyonunu açıklar.
 
 ## GitHub Actions Workflow

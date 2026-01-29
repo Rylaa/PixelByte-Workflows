@@ -21,6 +21,15 @@ Load these references when needed:
 - QA report template: `qa-report-template.md` → Glob: `**/references/qa-report-template.md`
 - Responsive validation: `responsive-validation.md` → Glob: `**/references/responsive-validation.md`
 - Accessibility validation: `accessibility-validation.md` → Glob: `**/references/accessibility-validation.md`
+- Color extraction: `color-extraction.md` → Glob: `**/references/color-extraction.md`
+- Opacity extraction: `opacity-extraction.md` → Glob: `**/references/opacity-extraction.md`
+- Gradient handling: `gradient-handling.md` → Glob: `**/references/gradient-handling.md`
+- Frame properties: `frame-properties.md` → Glob: `**/references/frame-properties.md`
+- Shadow & blur effects: `shadow-blur-effects.md` → Glob: `**/references/shadow-blur-effects.md`
+- Accessibility patterns: `accessibility-patterns.md` → Glob: `**/references/accessibility-patterns.md`
+- Responsive patterns: `responsive-patterns.md` → Glob: `**/references/responsive-patterns.md`
+- Visual diff template: `visual-diff-template.md` → Glob: `**/references/visual-diff-template.md`
+- Preview setup: `preview-setup.md` → Glob: `**/references/preview-setup.md`
 - Error recovery: `error-recovery.md` → Glob: `**/references/error-recovery.md`
 
 # Compliance Checker Agent

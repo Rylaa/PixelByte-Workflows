@@ -1,5 +1,7 @@
 # Code Connect Workflow Guide
 
+> **Used by:** design-analyst
+
 Figma component'lerini mevcut codebase component'lerine eşleştirmek için kapsamlı kılavuz.
 
 ---

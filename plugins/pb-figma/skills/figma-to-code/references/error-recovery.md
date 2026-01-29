@@ -1,5 +1,7 @@
 # Error Recovery Patterns
 
+> **Used by:** all agents
+
 Bu dokuman, agent pipeline'da hata durumlarinda recovery stratejilerini tanimlar.
 
 ---

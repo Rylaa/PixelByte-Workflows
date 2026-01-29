@@ -1,5 +1,7 @@
 # Responsive Patterns Reference
 
+> **Used by:** code-generator-*, compliance-checker
+
 ## Breakpoint Definitions
 
 Standard Figma frame sizes mapped to platform breakpoints:

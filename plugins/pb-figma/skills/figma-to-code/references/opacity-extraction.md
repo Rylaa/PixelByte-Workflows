@@ -1,5 +1,7 @@
 # Opacity Extraction Reference
 
+> **Used by:** design-analyst, design-validator, code-generator-*, compliance-checker
+
 ## Compound Opacity Calculation
 
 Figma stores opacity at multiple levels. Calculate effective opacity:

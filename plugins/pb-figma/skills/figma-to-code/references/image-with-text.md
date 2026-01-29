@@ -1,5 +1,7 @@
 # Image-with-Text Handling Reference
 
+> **Used by:** design-analyst, design-validator
+
 Comprehensive reference for detecting and handling illustrations that contain embedded text labels, preventing duplicate text generation during Figma-to-code conversion.
 
 ## Problem Statement

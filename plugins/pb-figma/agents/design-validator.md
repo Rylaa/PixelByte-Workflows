@@ -20,6 +20,13 @@ tools:
 
 Load these references when needed:
 - Validation guide: `validation-guide.md` → Glob: `**/references/validation-guide.md`
+- Gradient handling: `gradient-handling.md` → Glob: `**/references/gradient-handling.md`
+- Color extraction: `color-extraction.md` → Glob: `**/references/color-extraction.md`
+- Opacity extraction: `opacity-extraction.md` → Glob: `**/references/opacity-extraction.md`
+- Frame properties: `frame-properties.md` → Glob: `**/references/frame-properties.md`
+- Shadow & blur effects: `shadow-blur-effects.md` → Glob: `**/references/shadow-blur-effects.md`
+- Illustration detection: `illustration-detection.md` → Glob: `**/references/illustration-detection.md`
+- Image with text: `image-with-text.md` → Glob: `**/references/image-with-text.md`
 - Error recovery: `error-recovery.md` → Glob: `**/references/error-recovery.md`
 
 # Design Validator Agent
