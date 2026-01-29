@@ -564,118 +564,16 @@ Replace hardcoded values with CSS custom properties or Tailwind tokens from the 
 
 ##### Apply Gradients from Spec
 
-**Read gradient from Implementation Spec "Text with Gradient" or "Background Gradient" section:**
+Read gradient from Implementation Spec "Text with Gradient" or "Background Gradient" section and map to CSS/Tailwind.
 
-```markdown
-### Background Gradient
-- **Gradient Type:** LINEAR
-- **Angle:** 180°
-- **Stops:**
-  - Position 0.0: #FF0000
-  - Position 0.5: #00FF00
-  - Position 1.0: #0000FF
-```
+- Gradient types, CSS/Tailwind mapping, angle conversion, and code examples: `@skills/figma-to-code/references/gradient-handling.md`
 
-**Map to CSS/Tailwind gradient:**
-
-**LINEAR gradient:**
-```tsx
-// Tailwind arbitrary value
-<div className="bg-[linear-gradient(180deg,#FF0000_0%,#00FF00_50%,#0000FF_100%)]">
-
-// Tailwind gradient utilities (limited colors)
-<div className="bg-gradient-to-b from-red-500 via-green-500 to-blue-500">
-
-// CSS-in-JS / style prop
-<div style={{
-  background: 'linear-gradient(180deg, #FF0000 0%, #00FF00 50%, #0000FF 100%)'
-}}>
-```
-
-**RADIAL gradient:**
-```tsx
-// CSS arbitrary value
-<div className="bg-[radial-gradient(circle,#FFFF00_0%,#FF00FF_100%)]">
-
-// Style prop
-<div style={{
-  background: 'radial-gradient(circle at center, #FFFF00 0%, #FF00FF 100%)'
-}}>
-```
-
-**ANGULAR (conic) gradient:**
-```tsx
-// Conic gradient (for angular/sweep gradients)
-<div className="bg-[conic-gradient(from_0deg,#FF0000,#00FF00,#0000FF,#FF0000)]">
-
-// With specific stop positions
-<div style={{
-  background: `conic-gradient(
-    from 0deg at center,
-    #bc82f3 16.73%,
-    #f4b9ea 23.65%,
-    #8d98ff 35.18%,
-    #aa6eee 58.15%,
-    #ff6777 69.70%,
-    #ffba71 80.95%,
-    #c686ff 92.41%
-  )`
-}}>
-```
-
-**Gradient type mapping:**
-
-| Figma Type | CSS Function | Example |
-|------------|--------------|---------|
-| LINEAR | `linear-gradient()` | `linear-gradient(90deg, #F00, #00F)` |
-| RADIAL | `radial-gradient()` | `radial-gradient(circle, #F00, #00F)` |
-| ANGULAR | `conic-gradient()` | `conic-gradient(from 0deg, #F00, #00F)` |
-| DIAMOND | `conic-gradient()` | Treat as conic |
-
-**Angle conversion (Figma to CSS):**
-
-| Figma Angle | CSS Direction | Tailwind |
-|-------------|---------------|----------|
-| 0° | `to right` | `bg-gradient-to-r` |
-| 90° | `to bottom` | `bg-gradient-to-b` |
-| 180° | `to left` | `bg-gradient-to-l` |
-| 270° | `to top` | `bg-gradient-to-t` |
-| 45° | `to bottom right` | `bg-gradient-to-br` |
-
-**Text with gradient:**
-```tsx
-// Text gradient using background-clip
-<span
-  className="bg-clip-text text-transparent bg-[linear-gradient(90deg,#FF0000,#0000FF)]"
->
-  Gradient Text
-</span>
-
-// Conic gradient text
-<span
-  className="bg-clip-text text-transparent"
-  style={{
-    background: `conic-gradient(
-      from 0deg,
-      #bc82f3 16.73%,
-      #f4b9ea 23.65%,
-      #8d98ff 35.18%,
-      #c686ff 92.41%
-    )`
-  }}
->
-  Rainbow Text
-</span>
-```
-
-**Critical rules:**
-
-1. **Preserve ALL gradient stops** - Every stop from spec must appear
-2. **Use exact percentages** - Convert decimal to percent (0.1673 → 16.73%)
-3. **Preserve precision** - Don't round 16.73% to 17%
-4. **Use `bg-clip-text text-transparent`** for text gradients
-5. **Prefer Tailwind utilities** when gradient is simple (2-3 colors, standard angles)
-6. **Use style prop** for complex gradients (4+ colors, precise positions)
+**Workflow:**
+1. Read gradient type and all stops from Implementation Spec
+2. Map Figma gradient type to CSS function (`linear-gradient`, `radial-gradient`, `conic-gradient`)
+3. Convert stop positions from decimal to percentage (0.1673 -> 16.73%)
+4. For text gradients, use `bg-clip-text text-transparent` pattern
+5. Prefer Tailwind utilities for simple gradients (2-3 colors, standard angles); use style prop for complex ones (4+ colors, precise positions)
 
 ##### Apply Text Decoration from Spec
 
