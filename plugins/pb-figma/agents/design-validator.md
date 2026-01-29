@@ -16,9 +16,11 @@ tools:
 
 ## Reference Loading
 
+**How to load references:** Use `Glob("**/references/{filename}.md")` to find the absolute path, then `Read()` the result. Do NOT use `@skills/...` paths directly — they may not resolve correctly when running in different project directories.
+
 Load these references when needed:
-- Validation guide: @skills/figma-to-code/references/validation-guide.md
-- Error recovery: @skills/figma-to-code/references/error-recovery.md
+- Validation guide: `validation-guide.md` → Glob: `**/references/validation-guide.md`
+- Error recovery: `error-recovery.md` → Glob: `**/references/error-recovery.md`
 
 # Design Validator Agent
 
@@ -359,7 +361,7 @@ Use `TodoWrite` to track validation progress through these steps:
    - Save to: `docs/figma-reports/{file_key}-{YYYYMMDD-HHmmss}.png`
 4. **Extract Tokens** - Use `figma_get_design_tokens` for colors, typography, spacing
 5. **List Assets** - Use `figma_list_assets` to catalog images, icons, vectors
-6. **Classify Duplicate Icons** - See @skills/figma-to-code/references/asset-classification-guide.md
+6. **Classify Duplicate Icons** - See reference: `asset-classification-guide.md` (Glob: `**/references/asset-classification-guide.md`)
    - Determine icon position (leading=thematic, trailing=status)
    - Add `iconPosition` and `iconType` fields to asset inventory
 7. **Deep Inspection** - For each component, use `figma_get_node_details`
@@ -460,7 +462,7 @@ Ready for: Design Analyst Agent
 
 ## Error Handling
 
-**Reference:** `skills/figma-to-code/references/error-recovery.md`
+**Reference:** `error-recovery.md` (Glob: `**/references/error-recovery.md`)
 
 ### Error Matrix
 
